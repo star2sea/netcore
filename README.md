@@ -1,2 +1,2 @@
 # netcore
-c++ multithread netlib
+c++ multi-thread
