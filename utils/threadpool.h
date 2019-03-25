@@ -4,22 +4,27 @@
 #include "blockingqueue.h"
 #include "noncopyable.h"
 #include <iostream>
+#include <vector>
+#include <thread>
 
 namespace netcore
 {
 	class ThreadPool:NonCopyable
 	{
 	public:
-		ThreadPool(int threadnum) : threadnum_(threadnum) {}
+		typedef std::function<void()> Task;
+		ThreadPool(int threadnum) : threadnum_(threadnum), stop_(true) {}
 		~ThreadPool();
 
 		void start();
 		void stop();
-		void run(std::function<void()> &task);
+		void run(Task &task);
 
 	private:
 		int threadnum_;
-		BlockingQueue queue_;
+		bool stop_;
+		std::vector<std::thread> threads_;
+		BlockingQueue<Task> queue_;
 	};
 }
 

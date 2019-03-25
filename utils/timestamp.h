@@ -10,7 +10,6 @@ namespace netcore
 	class TimeStamp
 	{
 	public:
-		TimeStamp() = default;
 		TimeStamp(std::chrono::time_point<std::chrono::system_clock> tp) :tp_(tp) {}
 		
 		static TimeStamp now() { return TimeStamp(std::chrono::system_clock::now()); }
