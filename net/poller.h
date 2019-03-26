@@ -12,6 +12,7 @@ namespace netcore
 	{
 	public:
 		Poller(EventLoop * loop) : loop_(loop) {}
+        virtual ~Poller() = default;
 		virtual void updateChannel(Channel *) = 0;
 		virtual void poll() = 0;
 	private:

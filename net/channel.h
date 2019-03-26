@@ -1,6 +1,7 @@
 #ifndef __CHANNEL_H
 #define __CHANNEL_H
 #include "../utils/noncopyable.h"
+#include "eventloop.h"
 
 namespace netcore
 {
@@ -29,7 +30,7 @@ namespace netcore
 		void enableAll() { evt_ |= EVT_RW; update(); }
 
 		void disableReading() { evt_ &= (~EVT_R); update(); }
-		void disableWriting() { evt_ != (~EVT_W); update(); }
+		void disableWriting() { evt_ &= (~EVT_W); update(); }
 		void disableAll() { evt_ = EVT_NONE; update(); }
 
 		bool isReading() const { return evt_ & EVT_R; }
@@ -44,8 +45,8 @@ namespace netcore
 
 	private:
 		int fd_;
-		int evt_;
 		EventLoop * loop_;
+        int evt_;
 		ReadableCallback readableCallback_;
 		WritableCallback writableCallback_;
 	};

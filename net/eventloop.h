@@ -2,12 +2,12 @@
 #define __EVENTLOOP_H
 #include "../utils/noncopyable.h"
 #include "poller.h"
-#include "channel.h"
 #include <thread>
 #include <cassert>
 namespace netcore
 {
-	class EventLoop :NonCopyable
+    class Channel;
+    class EventLoop :NonCopyable
 	{
 	public:
 		EventLoop();

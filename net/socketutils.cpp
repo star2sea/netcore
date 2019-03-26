@@ -12,7 +12,7 @@ namespace netcore
 		#else
 			auto flags = fcntl(fd, F_GETFL, 0);
 			flags |= O_NONBLOCK;
-			fcntl(sockfd, F_SETFL, flags);
+			fcntl(fd, F_SETFL, flags);
 		#endif
 		}
 

@@ -1,4 +1,5 @@
 #include "eventloop.h"
+#include "channel.h"
 #include "select.h"
 #include "epoll.h"
 #include "kqueue.h"
@@ -48,9 +49,9 @@ void EventLoop::updateChannel(Channel *channel)
 
 Poller * EventLoop::defaultPoller()
 {
-#ifdef USE_EPOLL:
+#ifdef USE_EPOLL
 	return new EpollPoller(this);
-#elif USE_KQUEUE:
+#elif USE_KQUEUE
 	return new KqueuePoller(this);
 #else
 	return new SelectPoller(this);

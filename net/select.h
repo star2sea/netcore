@@ -4,7 +4,7 @@
 #include "poller.h"
 namespace netcore
 {
-	class SelectPoller :Poller
+	class SelectPoller :public Poller
 	{
 	public:
 		SelectPoller(EventLoop *loop) :Poller(loop) {}
