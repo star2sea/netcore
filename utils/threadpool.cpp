@@ -37,7 +37,7 @@ void ThreadPool::stop()
 	}
 }
 
-void ThreadPool::run(Task &task)
+void ThreadPool::run(const Task &task)
 {
 	queue_.put(task);
 }

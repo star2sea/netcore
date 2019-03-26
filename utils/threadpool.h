@@ -18,7 +18,7 @@ namespace netcore
 
 		void start();
 		void stop();
-		void run(Task &task);
+		void run(const Task &task);
 
 	private:
 		int threadnum_;

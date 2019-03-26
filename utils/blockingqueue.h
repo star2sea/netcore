@@ -8,11 +8,11 @@
 namespace netcore
 {
 	template<typename T>
-	class BlockQueue:NonCopyable
+	class BlockingQueue:NonCopyable
 	{
 	public:
-		T & get();
-		void put(T &);
+		T get();
+		void put(const T &);
 		bool tryGet(T &);
 
 	private:

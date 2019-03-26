@@ -14,6 +14,13 @@ include_directories(${PROJECT_SOURCE_DIR})
 string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE}})
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/libs)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+include_directories(${PROJECT_SOURCE_DIR})
+link_directories(${PROJECT_BINARY_DIR}/libs)
+
 macro(add_vg_source_dir name)
     file(GLOB SRC_FILE ${name}/*.h ${name}/*.hpp ${name}/*.cc ${name}/*.cpp)
     list(APPEND ALL_SRC ${SRC_FILE})
