@@ -5,10 +5,13 @@
 #include <Winsock2.h>
 #include <io.h>
 #include <Ws2def.h> 
+#include <ws2ipdef.h>
+#include <WS2tcpip.h> //inet_pton
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>  // IPPROTO_TCP
 #include <netinet/tcp.h> // TCP_NODELAY
+#include <arpa/inet.h>
 #include <errno.h>
 #endif
 
@@ -26,12 +29,12 @@
 #define ERRNO errno
 #endif
 
-#define struct sockaddr SA
-
 namespace netcore
 {
 	namespace socketutils
 	{
+		//bool listen(int n);
+		
 		void setNonBlocking(int fd);
 		int createSocket();
 		int createNonBlockingSocket();

@@ -13,7 +13,7 @@ namespace netcore
 		
 		~Socket() {}
 
-		void listen();
+		/*void listen();
 		void bind();
 		int accept();
 		int connect();
@@ -29,7 +29,7 @@ namespace netcore
 		void setTcpNoDelay(bool on);
 		void setReuseAddr(bool on);
 		void setReusePort(bool on);
-		void setKeepAlive(bool on);
+		void setKeepAlive(bool on);*/
 
 	private:
 		int sockfd_;
