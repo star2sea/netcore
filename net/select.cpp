@@ -6,7 +6,7 @@ using namespace netcore;
 void SelectPoller::updateChannel(Channel *channel)
 {
 	loop_->assertInOwnThread();
-	change_.insert(channel);
+	changes_.insert(channel);
 }
 
 void SelectPoller::poll()
@@ -61,7 +61,7 @@ void SelectPoller::poll()
 
 void SelectPoller::handleChangeChannels()
 {
-	for (auto iter = change_.cbegin(); iter != change_.cend(); ++iter)
+	for (auto iter = changes_.cbegin(); iter != changes_.cend(); ++iter)
 	{
 		Channel * channel = *iter;
 		int fd = channel->fd();
@@ -79,7 +79,7 @@ void SelectPoller::handleChangeChannels()
 			}
 		}
 	}
-	change_.clear();
+	changes_.clear();
 }
 
 void SelectPoller::handleActiveChannels()

@@ -22,6 +22,7 @@
 #define SOCKET_HANDLE(fd) _get_osfhandle(fd)
 #define CLOSE_SOCKET(fd) closesocket(SOCKET_HANDLE(fd))
 #define ERRNO WSAGetLastError()
+typedef long long ssize_t;
 #else
 #define SOCKET_FD(fd) fd
 #define SOCKET_HANDLE(fd) fd
@@ -32,9 +33,7 @@
 namespace netcore
 {
 	namespace socketutils
-	{
-		//bool listen(int n);
-		
+	{		
 		void setNonBlocking(int fd);
 		int createSocket();
 		int createNonBlockingSocket();

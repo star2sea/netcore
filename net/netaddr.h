@@ -1,6 +1,5 @@
 #ifndef __NETADDR_H
 #define __NETADDR_H
-#include "socketutils.h"
 #include <string>
 
 namespace netcore

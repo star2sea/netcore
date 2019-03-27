@@ -24,7 +24,7 @@ namespace netcore
 		EventLoop * loop_;
 		int activeNum_;
 		std::map<int, Channel*> channels_;
-		std::set<Channel *> change_;
+		std::set<Channel *> changes_;
 	};
 }
 
