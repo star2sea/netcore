@@ -20,11 +20,16 @@ namespace netcore
 			return t;
 		}
 
-		void put(const T &t) 
+		std::vector<T> getAll()
 		{
+			std::vector<T> vec;
 			std::unique_lock<std::mutex> lock(mutex_);
-			queue_.push(t);
-			cond_.notify_one();
+			while (!queue_.empty())
+			{
+				vec.emplace_back(queue_.front());
+				queue_.pop();
+			}
+			return vec;
 		}
 
 		bool tryGet(T &t) 
@@ -35,6 +40,13 @@ namespace netcore
 			t = queue_.front();
 			queue_.pop();
 			return true;
+		}
+
+		void put(const T &t)
+		{
+			std::unique_lock<std::mutex> lock(mutex_);
+			queue_.push(t);
+			cond_.notify_one();
 		}
 
 	private:

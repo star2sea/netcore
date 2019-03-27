@@ -2,7 +2,8 @@
 #define __POLLER_H
 #include "../utils/noncopyable.h"
 #include <iostream>
-#include <vector>
+#include <map>
+#include <set>
 namespace netcore
 {
 	class EventLoop;
@@ -15,9 +16,15 @@ namespace netcore
         virtual ~Poller() = default;
 		virtual void updateChannel(Channel *) = 0;
 		virtual void poll() = 0;
-	private:
+
+	protected:
+		virtual void handleActiveChannels() = 0;
+
+	protected:
 		EventLoop * loop_;
-		std::vector<Channel *> channels_;
+		int activeNum_;
+		std::map<int, Channel*> channels_;
+		std::set<Channel *> change_;
 	};
 }
 

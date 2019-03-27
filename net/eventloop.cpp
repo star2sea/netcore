@@ -7,6 +7,7 @@ using namespace netcore;
 
 EventLoop::EventLoop()
 	:poller_(defaultPoller()),
+	tid_(std::this_thread::get_id()),
 	running_(false)
 {
 
@@ -27,6 +28,11 @@ void EventLoop::loop()
 	while (running_)
 	{
 		poller_->poll();
+		std::vector<Func> funcs = pendingFuncs_.getAll();
+		for (const Func & func : funcs)
+		{
+			func();
+		}
 	}
 }
 
@@ -45,6 +51,18 @@ void EventLoop::quit()
 void EventLoop::updateChannel(Channel *channel)
 {
 	poller_->updateChannel(channel);
+}
+
+void EventLoop::runInLoop(Func &cb)
+{
+	if (inOwnThread())
+	{
+		cb();
+	}
+	else
+	{
+		pendingFuncs_.put(cb);
+	}
 }
 
 Poller * EventLoop::defaultPoller()

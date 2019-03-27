@@ -37,6 +37,9 @@ namespace netcore
 		bool isWriting() const { return evt_ & EVT_W; }
 		bool isNonEvent() const { return !(evt_ & EVT_RW); }
 
+		void handleReadable() { if (readableCallback_) readableCallback_(); }
+		void handleWritable() { if (writableCallback_) writableCallback_(); }
+
 		void setReadableCallback(const ReadableCallback & cb) { readableCallback_ = cb; }
 		void setWritableCallback(const WritableCallback & cb) { writableCallback_ = cb; }
 
