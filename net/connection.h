@@ -21,6 +21,7 @@ namespace netcore
 		Connection(EventLoop *loop, int connfd);
 		~Connection();
 
+        int fd() const {return sock_.fd();}
 		void connectionEstablished();
 		void connectionDestroyed();
 

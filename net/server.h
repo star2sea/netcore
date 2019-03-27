@@ -20,7 +20,7 @@ namespace netcore
 		void stop();
 
 		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
-		void seMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
+		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
 	private:
 		Acceptor * newAcceptor(EventLoop *loop);

@@ -27,7 +27,7 @@ void Server::start(int threadnum)
 		{
 			EventLoop * loop = new EventLoop();
 			Acceptor *acceptor = newAcceptor(loop);
-			threads_.emplace_back(acceptor); // todo
+			threads_.emplace_back(acceptor); // todo thread初始化结束后立刻调用acceptor->startAccept()
 		}
 	}
 	else
@@ -48,7 +48,7 @@ void Server::stop()
 
 	for (auto & thread : threads_)
 	{
-		thread.join();
+		thread.join(); // todo
 	}
 }
 

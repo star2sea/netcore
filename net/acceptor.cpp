@@ -11,13 +11,17 @@ Acceptor::Acceptor(EventLoop * loop, const NetAddr &addr)
 	acceptChannel_(new Channel(sock_.fd(), loop_)),
 	accepting_(false)
 {
-	acceptChannel_->setReadableCallback(std::bind(&Acceptor::handleReadable, this));
-	// todo setting sock_
+    sock_.setReuseAddr(true);
+    sock_.setReusePort(true);
+    sock_.setTcpNoDelay(true);
+    
+    acceptChannel_->setReadableCallback(std::bind(&Acceptor::handleReadable, this));
 }
 
 Acceptor::~Acceptor()
 {
 	stopAccept();
+    sock_.close();
 }
 
 void Acceptor::startAccept()
@@ -44,20 +48,24 @@ void Acceptor::stopAccept()
 void Acceptor::handleReadable()
 {
 	loop_->assertInOwnThread();
-	int connfd = sock_.accept();
+	int connfd = sock_.accept(); // todo
 	if (connfd > 0)
 	{
 		onNewConnection(connfd);
 	}
 	else
 	{
-		// todo
+		// todo error
 	}
 }
 
 void Acceptor::handleClosed(const ConnectionPtr & conn)
 {
-	// todo
+    loop_->assertInOwnThread();
+    int fd = conn->fd();
+    assert (connections_.find(fd) != connections_.end());
+    connections_.erase(fd);
+    conn->connectionDestroyed();
 }
 
 void Acceptor::onNewConnection(int connfd)

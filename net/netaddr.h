@@ -2,6 +2,12 @@
 #define __NETADDR_H
 #include <string>
 
+#ifdef _WIN32
+#include <netinet/in.h>
+#else
+#include <netinet/in.h>
+#endif
+
 namespace netcore
 {
 	class NetAddr

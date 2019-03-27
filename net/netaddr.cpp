@@ -1,6 +1,8 @@
 #include "netaddr.h"
+#include "socket.h"
 #include <iostream>
 #include <cstring> //memset
+
 using namespace netcore;
 
 NetAddr::NetAddr(const char *ip, short port)

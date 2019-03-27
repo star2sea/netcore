@@ -15,6 +15,7 @@ Connection::Connection(EventLoop *loop, int connfd)
 Connection::~Connection()
 {
 	sock_.close();
+    delete connChannel_;
 }
 
 void Connection::connectionEstablished()
@@ -32,14 +33,17 @@ void Connection::connectionEstablished()
 
 void Connection::connectionDestroyed()
 {
-	connChannel_->disableAll();
-	delete connChannel_; // todo
-
+    state_ = Disconnected;
+    
+    connChannel_->disableAll();
+    
+    if (connectionCallback_)
+        connectionCallback_(shared_from_this());
 }
 
 void Connection::handleReadable()
 {
-
+    
 }
 
 void Connection::handleWritable()

@@ -36,8 +36,8 @@ namespace netcore
 
 	private:
 		Poller * poller_;
-		bool running_;
 		std::thread::id tid_;
+        bool running_;
 		BlockingQueue<Func> pendingFuncs_;
 		
 	};
