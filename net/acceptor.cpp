@@ -66,6 +66,7 @@ void Acceptor::handleReadable()
 	int connfd = sock_.accept(&peeraddr);
 	if (connfd > 0)
 	{
+		Socket::setNonBlocking(connfd);
 		onNewConnection(connfd, peeraddr);
 	}
 	else
@@ -87,6 +88,7 @@ void Acceptor::onNewConnection(int connfd, NetAddr & peeraddr)
 {
 	loop_->assertInOwnThread();
 	assert(connections_.find(connfd) == connections_.end());
+
 	std::shared_ptr<Connection> conn = std::make_shared<Connection>(loop_, connfd, peeraddr);
 
 	conn->setMessageCallback(messageCallback_);

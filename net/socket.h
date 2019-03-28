@@ -38,10 +38,11 @@ typedef void * OPTVAL;
 
 namespace netcore
 {
-	class Socket:NonCopyable
+	class Socket
 	{
 		
 	public:
+		Socket() = default;
 		Socket(int sockfd) :sockfd_(sockfd) {}
 		
 		~Socket() {}
@@ -68,6 +69,8 @@ namespace netcore
 
 		struct sockaddr_in getLocalAddr();
 		struct sockaddr_in getPeerAddr();
+
+		int getSocketError();
 
 		static void setNonBlocking(int fd);
 		static int createSocket();

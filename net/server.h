@@ -1,14 +1,14 @@
 #ifndef __SERVER_H
 #define __SERVER_H
+#include <string>
+#include <vector>
+#include <memory>
 #include "../utils/noncopyable.h"
 #include "netaddr.h"
 #include "eventloop.h"
 #include "eventloopthread.h"
 #include "acceptor.h"
 #include "callback.h"
-#include <string>
-#include <vector>
-#include <memory>
 namespace netcore
 {
 	class Server :NonCopyable

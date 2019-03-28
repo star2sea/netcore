@@ -1,5 +1,6 @@
-#include "server.h"
 #include <assert.h>
+#include "server.h"
+
 using namespace netcore;
 
 Server::Server(EventLoop *loop, const NetAddr & addr, std::string &name)

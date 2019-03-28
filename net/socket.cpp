@@ -151,3 +151,23 @@ void Socket::setKeepAlive(bool on)
 	int optval = on ? 1 : 0;
 	::setsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_KEEPALIVE, (OPTVAL)(&optval), static_cast<socklen_t>(sizeof optval));
 }
+
+int Socket::getSocketError()
+{
+	int optval = 0;
+	socklen_t optlen = static_cast<socklen_t>(sizeof optval);
+
+#ifdef _WIN32
+	::getsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_ERROR, (OPTVAL)&optval, &optlen);
+	return optval;
+#else
+	if (::getsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_ERROR, (OPTVAL)&optval, &optlen) < 0)
+	{
+		return errno;
+	}
+	else
+	{
+		return optval;
+	}
+#endif
+}
