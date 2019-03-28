@@ -42,62 +42,112 @@ void Socket::bind(const NetAddr & addr)
 	}
 }
 
-int Socket::accept()
+int Socket::accept(NetAddr *peeraddr)
 {
-
+	socklen_t addrlen = static_cast<socklen_t>(sizeof *peeraddr);
+	int connfd = ::accept(SOCKET_HANDLE(sockfd_), peeraddr->toSockAddr(), &addrlen);
+	if (connfd < 0)
+	{
+		std::cout << "Socket::accept error" << std::endl;
+	}
+	return connfd;
 }
 
-int Socket::connect()
+int Socket::connect(const NetAddr & addr)
 {
-
+	return ::connect(SOCKET_HANDLE(sockfd_), addr.toSockAddr(), sizeof addr);
 }
 
-ssize_t Socket::readv()
+ssize_t Socket::read(char *buf, size_t count)
 {
-
+#ifdef _WIN32
+	return ::recv(SOCKET_HANDLE(sockfd_), buf, count, 0);
+#else
+	return ::read(SOCKET_HANDLE(sockfd_), buf, count);
+#endif
 }
 
-ssize_t Socket::write()
+ssize_t Socket::write(const char* buf, size_t len)
 {
-
+#ifdef _WIN32
+	return ::send(SOCKET_HANDLE(sockfd_), buf, len, 0);
+#else
+	return ::write(SOCKET_HANDLE(sockfd_), buf, len);
+#endif
 }
 
 void Socket::close()
 {
-
+	CLOSE_SOCKET(sockfd_);
 }
 
 void Socket::shutdown()
 {
-
+#ifdef _WIN32
+	::shutdown(SOCKET_HANDLE(sockfd_), SD_BOTH);
+#else
+	::shutdown(SOCKET_HANDLE(sockfd_), SHUT_RDWR);
+#endif
 }
 
 void Socket::shutdownRead()
 {
-
+#ifdef _WIN32
+	::shutdown(SOCKET_HANDLE(sockfd_), SD_RECEIVE);
+#else
+	::shutdown(SOCKET_HANDLE(sockfd_), SHUT_RD);
+#endif
 }
 
 void Socket::shutdownWrite()
 {
+#ifdef _WIN32
+	::shutdown(SOCKET_HANDLE(sockfd_), SD_SEND);
+#else
+	::shutdown(SOCKET_HANDLE(sockfd_), SHUT_WR);
+#endif
+}
 
+struct sockaddr_in Socket::getLocalAddr()
+{
+	struct sockaddr_in localaddr;
+	memset(&localaddr, 0, sizeof localaddr);
+	socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
+	::getsockname(SOCKET_HANDLE(sockfd_), (struct sockaddr *)&localaddr, &addrlen);
+	return localaddr;
+}
+
+struct sockaddr_in Socket::getPeerAddr()
+{
+	struct sockaddr_in peeraddr;
+	memset(&peeraddr, 0, sizeof peeraddr);
+	socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+	::getpeername(SOCKET_HANDLE(sockfd_), (struct sockaddr *)&peeraddr, &addrlen);
+	return peeraddr;
 }
 
 void Socket::setTcpNoDelay(bool on)
 {
-
+	int optval = on ? 1 : 0;
+	::setsockopt(SOCKET_HANDLE(sockfd_), IPPROTO_TCP, TCP_NODELAY, (OPTVAL)(&optval), static_cast<socklen_t>(sizeof optval));
 }
 
 void Socket::setReuseAddr(bool on)
 {
-
+	int optval = on ? 1 : 0;
+	::setsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_REUSEADDR, (OPTVAL)(&optval), static_cast<socklen_t>(sizeof optval));
 }
 
 void Socket::setReusePort(bool on)
 {
-
+#ifndef _WIN32
+	int optval = on ? 1 : 0;
+	::setsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_REUSEPORT, (OPTVAL)(&optval), static_cast<socklen_t>(sizeof optval));
+#endif
 }
 
 void Socket::setKeepAlive(bool on)
 {
-
+	int optval = on ? 1 : 0;
+	::setsockopt(SOCKET_HANDLE(sockfd_), SOL_SOCKET, SO_KEEPALIVE, (OPTVAL)(&optval), static_cast<socklen_t>(sizeof optval));
 }

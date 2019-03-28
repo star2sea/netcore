@@ -3,21 +3,34 @@
 #include "../utils/noncopyable.h"
 #include "eventloop.h"
 #include "acceptor.h"
+#include "netaddr.h"
 #include <thread>
+#include "callback.h"
+#include <memory>
 namespace netcore
 {
-    class EventLoopThread:NonCopyable
+    class EventLoopThread :NonCopyable
     {
     public:
-        EventLoopThread(EventLoop *loop, Acceptor * acceptor);
+        EventLoopThread(const NetAddr & addr, const ConnectionCallback &conncb, const MessageCallback &msgcb);
         ~EventLoopThread();
-        void join();
+
+		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
+		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
+
+		void join();
+
     private:
-        void threadFunc();
+        void threadFunc(const NetAddr & addr);
     private:
         EventLoop * loop_;
-        Acceptor * acceptor_;
+        std::shared_ptr<Acceptor> acceptor_;
         std::thread thread_;
+		std::mutex mtx_;
+		std::condition_variable cond_;
+
+		ConnectionCallback connectionCallback_;
+		MessageCallback messageCallback_;
     };
 }
 

@@ -9,6 +9,18 @@ void SelectPoller::updateChannel(Channel *channel)
 	changes_.insert(channel);
 }
 
+void SelectPoller::removeChannel(Channel *channel)
+{
+	loop_->assertInOwnThread();
+	
+	int fd = channel->fd();
+	if (channels_.find(fd) != channels_.end())
+		channels_.erase(fd);
+
+	if (changes_.find(channel) != changes_.end())
+		changes_.erase(channel);
+}
+
 void SelectPoller::poll()
 {
 	loop_->assertInOwnThread();
@@ -59,25 +71,26 @@ void SelectPoller::poll()
 	}
 }
 
+// 如果更新的时候，不删除，貌似没有必要使用changes_ todo
 void SelectPoller::handleChangeChannels()
 {
 	for (auto iter = changes_.cbegin(); iter != changes_.cend(); ++iter)
 	{
 		Channel * channel = *iter;
 		int fd = channel->fd();
-		bool nonEvt = channel->isNonEvent();
+		//bool nonEvt = channel->isNonEvent();
 		if (channels_.find(fd) == channels_.end())
 		{
-			if (!nonEvt)
-				channels_[fd] = channel;
+			//if (!nonEvt)
+			channels_[fd] = channel;
 		}
-		else
+		/*else
 		{
 			if (nonEvt)
 			{
 				channels_.erase(fd);
 			}
-		}
+		}*/
 	}
 	changes_.clear();
 }

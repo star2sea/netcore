@@ -25,14 +25,14 @@ void Server::start(int threadnum)
 	{
 		for (int i = 0; i < threadnum; ++i)
 		{
-			EventLoop * loop = new EventLoop();
-			Acceptor *acceptor = newAcceptor(loop);
-			threads_.emplace_back(acceptor); // todo thread初始化结束后立刻调用acceptor->startAccept()
+			threads_.push_back(std::unique_ptr<EventLoopThread>(new EventLoopThread(addr_, connectionCallback_, messageCallback_)));
 		}
 	}
 	else
 	{
-		Acceptor * acceptor = newAcceptor(loop_);
+		acceptor_ = std::make_shared<Acceptor>(loop_, addr_);
+		acceptor_->setMessageCallback(messageCallback_);
+		acceptor_->setConnectionCallback(connectionCallback_);
 		acceptor_->startAccept();
 	}
 }
@@ -44,18 +44,10 @@ void Server::stop()
 	running_ = false;
 	
 	if (acceptor_)
-		delete acceptor_;
+		acceptor_->stopAccept();
 
-	for (auto & thread : threads_)
+	for (auto & loopthread : threads_)
 	{
-		thread.join(); // todo
+		loopthread->join();
 	}
-}
-
-Acceptor * Server::newAcceptor(EventLoop *loop)
-{
-	Acceptor * acceptor = new Acceptor(loop, addr_);
-	acceptor->setMessageCallback(messageCallback_);
-	acceptor->setConnectionCallback(connectionCallback_);
-	return acceptor;
 }

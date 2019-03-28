@@ -2,40 +2,47 @@
 #include "channel.h"
 using namespace netcore;
 
-Connection::Connection(EventLoop *loop, int connfd)
+Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 	:loop_(loop),
 	sock_(connfd),
-	connChannel_(new Channel(connfd, loop)),
-	state_(Connecting)
+	connChannel_(connfd, loop),
+	state_(Connecting),
+	input_(65536),
+	output_(65536),
+	peeraddr_(peeraddr),
+	localaddr_(sock_.getLocalAddr())
 {
-	connChannel_->setReadableCallback(std::bind(&Connection::handleReadable, this));
-	connChannel_->setWritableCallback(std::bind(&Connection::handleWritable, this));
+	connChannel_.setReadableCallback(std::bind(&Connection::handleReadable, this));
+	connChannel_.setWritableCallback(std::bind(&Connection::handleWritable, this));
 }
 
 Connection::~Connection()
 {
 	sock_.close();
-    delete connChannel_;
 }
 
 void Connection::connectionEstablished()
 {
+	loop_->assertInOwnThread();
 	assert(state_ == Connecting);
 	state_ = Connected;
 
 	if (connectionCallback_)
 		connectionCallback_(shared_from_this());
 
-	connChannel_->enableReading();
-	// todo enableWriting()
-	
+	connChannel_.enableReading();
+	if (output_.readAvailable() > 0)
+	{
+		connChannel_.enableWriting();
+	}
 }
 
 void Connection::connectionDestroyed()
 {
-    state_ = Disconnected;
+	loop_->assertInOwnThread();
+	state_ = Disconnected;
     
-    connChannel_->disableAll();
+    connChannel_.disableAll();
     
     if (connectionCallback_)
         connectionCallback_(shared_from_this());
@@ -43,15 +50,85 @@ void Connection::connectionDestroyed()
 
 void Connection::handleReadable()
 {
-    
+	loop_->assertInOwnThread();
+	char buf[1024];
+	ssize_t n = sock_.read(buf, 1024);
+	if (n == 0)
+	{
+		handleClosed();
+	}
+	else if (n < 0)
+	{
+		std::cout << "Connection::handleReadable error" << std::endl;
+		handleClosed();
+	}
+	else
+	{
+		input_.append(buf, n);
+		messageCallback_(shared_from_this(), input_);
+	}
+
 }
 
 void Connection::handleWritable()
 {
-
+	loop_->assertInOwnThread();
+	ssize_t n = sock_.write(output_.readBegin(), output_.readAvailable());
+	if (n < 0)
+	{
+		std::cout << "Connection::handleWritable error" << std::endl;
+	}
+	else
+	{
+		output_.consume(n);
+		if (output_.readAvailable() == 0)
+		{
+			connChannel_.disableWriting();
+		}
+	}
 }
 
-void Connection::send()
+void Connection::handleClosed()
 {
+	loop_->assertInOwnThread();
+	closedCallback_(shared_from_this());
+}
 
+void Connection::send(const char* buf, size_t count)
+{
+	if (loop_->inOwnThread())
+	{
+		sendInLoop(buf, count);
+	}
+	else
+	{
+		loop_->runInLoop(std::bind(&Connection::sendInLoop, this, buf, count));
+	}
+}
+
+
+void Connection::sendInLoop(const char* buf, size_t count)
+{
+	loop_->assertInOwnThread();
+
+	if (output_.readAvailable() > 0)
+	{
+		assert(connChannel_.isWriting());
+		output_.append(buf, count);
+	}
+	else
+	{
+		assert(!connChannel_.isWriting());
+		ssize_t n = sock_.write(buf, count);
+		if (n < 0)
+		{
+			std::cout << "Connection::sendInLoop error" << std::endl;
+			output_.append(buf, count);
+		}
+		else if (n < count)
+		{
+			output_.append(buf + n, count - n);
+			connChannel_.enableWriting();
+		}
+	}
 }

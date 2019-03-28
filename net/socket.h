@@ -13,6 +13,7 @@
 #include <netinet/tcp.h> // TCP_NODELAY
 #include <arpa/inet.h>
 #include <errno.h>
+#include <unistd.h>
 #endif
 
 #include <fcntl.h>
@@ -25,11 +26,14 @@
 #define CLOSE_SOCKET(fd) closesocket(SOCKET_HANDLE(fd))
 #define ERRNO WSAGetLastError()
 typedef long long ssize_t;
+typedef int socklen_t;
+typedef char * OPTVAL;
 #else
 #define SOCKET_FD(fd) fd
 #define SOCKET_HANDLE(fd) fd
 #define CLOSE_SOCKET(fd) close(fd)
 #define ERRNO errno
+typedef void * OPTVAL;
 #endif
 
 namespace netcore
@@ -46,11 +50,11 @@ namespace netcore
 
 		void listen(int backlog);
 		void bind(const NetAddr & addr);
-		int accept();
-		int connect();
+		int accept(NetAddr *peeraddr);
+		int connect(const NetAddr & addr);
 
-		ssize_t readv();
-		ssize_t write();
+		ssize_t read(char *buf, size_t count);
+		ssize_t write(const char* buf, size_t len);
 
 		void close();
 		void shutdown();
@@ -61,6 +65,9 @@ namespace netcore
 		void setReuseAddr(bool on);
 		void setReusePort(bool on);
 		void setKeepAlive(bool on);
+
+		struct sockaddr_in getLocalAddr();
+		struct sockaddr_in getPeerAddr();
 
 		static void setNonBlocking(int fd);
 		static int createSocket();

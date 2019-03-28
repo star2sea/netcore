@@ -8,20 +8,19 @@ Acceptor::Acceptor(EventLoop * loop, const NetAddr &addr)
 	:loop_(loop),
 	addr_(addr),
 	sock_(Socket::createNonBlockingSocket()),
-	acceptChannel_(new Channel(sock_.fd(), loop_)),
+	acceptChannel_(sock_.fd(), loop_),
 	accepting_(false)
 {
     sock_.setReuseAddr(true);
     sock_.setReusePort(true);
     sock_.setTcpNoDelay(true);
     
-    acceptChannel_->setReadableCallback(std::bind(&Acceptor::handleReadable, this));
+    acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, shared_from_this()));
 }
 
 Acceptor::~Acceptor()
 {
-	stopAccept();
-    sock_.close();
+	sock_.close();
 }
 
 void Acceptor::startAccept()
@@ -29,33 +28,49 @@ void Acceptor::startAccept()
 	loop_->assertInOwnThread();
 	sock_.bind(addr_);
 	sock_.listen(1000);
-	acceptChannel_->enableReading();
+	acceptChannel_.enableReading();
 }
 
 void Acceptor::stopAccept()
 {
-	loop_->assertInOwnThread();
+	if (loop_->inOwnThread())
+	{
+		stopAcceptInLoop();
+	}
+	else
+	{
+		loop_->runInLoop(std::bind(&Acceptor::stopAcceptInLoop, shared_from_this()));
+	}
+}
 
+void Acceptor::stopAcceptInLoop()
+{
+	loop_->assertInOwnThread();
 	if (!accepting_)
 		return;
 	accepting_ = false;
-	acceptChannel_->disableAll();
-	delete acceptChannel_;  // channel update todo
-
-	// close connections todo
+	acceptChannel_.disableAll();
+	acceptChannel_.remove();
+	
+	for (auto iter = connections_.begin(); iter != connections_.end(); ++iter)
+	{
+		iter->second->connectionDestroyed();
+	}
+	connections_.clear();
 }
 
 void Acceptor::handleReadable()
 {
 	loop_->assertInOwnThread();
-	int connfd = sock_.accept(); // todo
+	NetAddr peeraddr;
+	int connfd = sock_.accept(&peeraddr);
 	if (connfd > 0)
 	{
-		onNewConnection(connfd);
+		onNewConnection(connfd, peeraddr);
 	}
 	else
 	{
-		// todo error
+		std::cout << "Acceptor::handleReadable error" << std::endl;
 	}
 }
 
@@ -68,15 +83,15 @@ void Acceptor::handleClosed(const ConnectionPtr & conn)
     conn->connectionDestroyed();
 }
 
-void Acceptor::onNewConnection(int connfd)
+void Acceptor::onNewConnection(int connfd, NetAddr & peeraddr)
 {
 	loop_->assertInOwnThread();
 	assert(connections_.find(connfd) == connections_.end());
-	std::shared_ptr<Connection> conn = std::make_shared<Connection>(connfd);
+	std::shared_ptr<Connection> conn = std::make_shared<Connection>(loop_, connfd, peeraddr);
 
 	conn->setMessageCallback(messageCallback_);
 	conn->setConnectionCallback(connectionCallback_);
-	conn->setClosedCallback(std::bind(&Acceptor::handleClosed, this, std::placeholders::_1));
+	conn->setClosedCallback(std::bind(&Acceptor::handleClosed, shared_from_this(), std::placeholders::_1));
 
 	connections_[connfd] = conn;
 

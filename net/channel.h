@@ -25,6 +25,8 @@ namespace netcore
 
 		int fd() { return fd_; }
 
+		void remove() { assert(isNonEvent()); loop_->removeChannel(this); }
+
 		void enableReading() { evt_ |= EVT_R; update(); }
 		void enableWriting() { evt_ |= EVT_W; update(); }
 		void enableAll() { evt_ |= EVT_RW; update(); }

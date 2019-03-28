@@ -3,7 +3,7 @@
 #include <string>
 
 #ifdef _WIN32
-#include <netinet/in.h>
+#include <winsock2.h>
 #else
 #include <netinet/in.h>
 #endif

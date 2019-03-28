@@ -7,6 +7,7 @@
 #include <cassert>
 #include <vector>
 #include <functional>
+#include "socket.h"
 namespace netcore
 {
     class Channel;
@@ -24,8 +25,9 @@ namespace netcore
 		void quit();
 
 		void updateChannel(Channel *);
+		void removeChannel(Channel *);
 
-		void runInLoop(Func &);
+		void runInLoop(const Func &);
 
 		bool inOwnThread() { return tid_ == std::this_thread::get_id(); } // TODO thread_±‰¡ø
 
@@ -33,11 +35,16 @@ namespace netcore
 
 	private:
 		Poller * defaultPoller();
+		void quitInLoop();
+		int createWakeupFd();
+		void wakeup();
 
 	private:
-		Poller * poller_;
+		std::unique_ptr<Poller> poller_;
 		std::thread::id tid_;
         bool running_;
+		Socket wakeupSock_;
+		std::unique_ptr<Channel> wakeupChannel_;
 		BlockingQueue<Func> pendingFuncs_;
 		
 	};

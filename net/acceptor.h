@@ -6,33 +6,33 @@
 #include "callback.h"
 #include "eventloop.h"
 #include "callback.h"
+#include "channel.h"
 #include <map>
 namespace netcore
 {
-	class Channel;
-
-	class Acceptor :NonCopyable
+	class Acceptor :NonCopyable, std::enable_shared_from_this<Acceptor>
 	{
 	public:
 		Acceptor(EventLoop * loop, const NetAddr &addr);
 		~Acceptor();
 
 		void startAccept();
+		void stopAccept();
 
 		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
 	private:
-		void stopAccept();
+		void stopAcceptInLoop();
 		void handleReadable();
 		void handleClosed(const ConnectionPtr & conn);
-		void onNewConnection(int connfd);
+		void onNewConnection(int connfd, NetAddr & peeraddr);
 
 	private:
 		EventLoop * loop_;
 		NetAddr addr_;
 		Socket sock_;
-		Channel * acceptChannel_;
+		Channel acceptChannel_;
 		bool accepting_;
 
 		std::map<int, ConnectionPtr> connections_;

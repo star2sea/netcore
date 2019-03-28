@@ -8,6 +8,7 @@
 #include "callback.h"
 #include <string>
 #include <vector>
+#include <memory>
 namespace netcore
 {
 	class Server :NonCopyable
@@ -23,15 +24,12 @@ namespace netcore
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
 	private:
-		Acceptor * newAcceptor(EventLoop *loop);
-
-	private:
 		EventLoop *loop_;
 		NetAddr addr_;
 		std::string name_;
-		Acceptor * acceptor_;
+		std::shared_ptr<Acceptor> acceptor_;
 		bool running_;
-		std::vector<EventLoopThread> threads_;
+		std::vector<std::unique_ptr<EventLoopThread>> threads_;
 
 		ConnectionCallback connectionCallback_;
 		MessageCallback messageCallback_;

@@ -18,6 +18,7 @@ namespace netcore
 		SelectPoller(EventLoop *loop) :Poller(loop) {}
 		~SelectPoller() override {}
 		void updateChannel(Channel *) override;
+		void removeChannel(Channel *) override;
 		void poll() override;
 	private:
 		void handleChangeChannels();

@@ -3,11 +3,13 @@
 #include "../utils/noncopyable.h"
 #include <memory>
 #include "eventloop.h"
+#include "channel.h"
 #include "callback.h"
 #include "socket.h"
+#include "buffer.h"
+#include "netaddr.h"
 namespace netcore
 {
-	class Channel;
 	class Connection :NonCopyable, std::enable_shared_from_this<Connection>
 	{
 	public:
@@ -18,7 +20,7 @@ namespace netcore
 			Disconnected
 		};
 
-		Connection(EventLoop *loop, int connfd);
+		Connection(EventLoop *loop, int connfd, NetAddr &peeraddr);
 		~Connection();
 
         int fd() const {return sock_.fd();}
@@ -32,13 +34,21 @@ namespace netcore
 		void handleReadable();
 		void handleWritable();
 
-		void send();
+		void send(const char* buf, size_t count);
+
+	private:
+		void sendInLoop(const char* buf, size_t count);
+		void handleClosed();
 
 	private:
 		EventLoop * loop_;
 		Socket sock_;
-		Channel *connChannel_;
+		Channel connChannel_;
 		Estate state_;
+		Buffer input_;
+		Buffer output_;
+		NetAddr peeraddr_;
+		NetAddr localaddr_;
 
 		MessageCallback messageCallback_;
 		ConnectionCallback connectionCallback_;
