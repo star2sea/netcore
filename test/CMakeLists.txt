@@ -7,3 +7,5 @@ target_link_libraries(server_test netcore)
 
 add_executable(client_test client_test.cpp)
 target_link_libraries(client_test netcore)
+
+add_subdirectory(http)
