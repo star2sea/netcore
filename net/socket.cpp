@@ -6,7 +6,10 @@ void Socket::setNonBlocking(int fd)
 {
 #ifdef _WIN32
 	u_long ul = 1;
-	ioctlsocket(SOCKET_HANDLE(fd), FIONBIO, &ul);
+	if (ioctlsocket(SOCKET_HANDLE(fd), FIONBIO, &ul) == SOCKET_ERROR)
+	{
+		std::cout << "ioctlsocket failed with error " << ERRNO << std::endl;
+	}
 #else
 	auto flags = fcntl(fd, F_GETFL, 0);
 	flags |= O_NONBLOCK;
@@ -30,7 +33,7 @@ void Socket::listen(int backlog)
 {
 	if (::listen(SOCKET_HANDLE(sockfd_), backlog) < 0)
 	{
-		std::cout << "Socket::listen error" << std::endl;
+		std::cout << "Socket::listen error " << ERRNO << std::endl;
 	}
 }
 
@@ -38,14 +41,14 @@ void Socket::bind(const NetAddr & addr)
 {
 	if (::bind(SOCKET_HANDLE(sockfd_), addr.toSockAddr(), sizeof addr) < 0)
 	{
-		std::cout << "Socket::bind error" << std::endl;
+		std::cout << "Socket::bind error " << ERRNO << std::endl;
 	}
 }
 
 int Socket::accept(NetAddr *peeraddr)
 {
 	socklen_t addrlen = static_cast<socklen_t>(sizeof *peeraddr);
-	int connfd = ::accept(SOCKET_HANDLE(sockfd_), peeraddr->toSockAddr(), &addrlen);
+	int connfd = SOCKET_FD(::accept(SOCKET_HANDLE(sockfd_), peeraddr->toSockAddr(), &addrlen));
 	if (connfd < 0)
 	{
 		std::cout << "Socket::accept error" << std::endl;

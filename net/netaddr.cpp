@@ -28,7 +28,7 @@ std::string NetAddr::toIpPort() const
 {
 	char ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &addr_.sin_addr.s_addr, ip, sizeof ip);
-	short port = ntohs(addr_.sin_port);
+	unsigned short port = ntohs(addr_.sin_port);
 	char buf[INET_ADDRSTRLEN + 3];
 	snprintf(buf, sizeof buf, "%s:%d", ip, port);
 	return buf;

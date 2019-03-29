@@ -44,6 +44,7 @@ namespace netcore
 		std::thread::id tid_;
         bool running_;
 		Socket wakeupSock_;
+		int wakeupFd_[2];
 		std::unique_ptr<Channel> wakeupChannel_;
 		BlockingQueue<Func> pendingFuncs_;
 		

@@ -15,6 +15,8 @@ Client::~Client()
 
 void Client::start(const NetAddr & serveraddr)
 {
+	connector_->setConnectionCallback(connectionCallback_);
+	connector_->setMessageCallback(messageCallback_);
 	connector_->connect(serveraddr);
 }
 

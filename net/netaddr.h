@@ -18,6 +18,8 @@ namespace netcore
 		NetAddr(const char *ip, short port);
 		NetAddr(short port);
 
+		struct sockaddr_in getAddr() { return addr_; }
+
 		std::string toIpPort() const;
 
 		struct sockaddr * toSockAddr() const;

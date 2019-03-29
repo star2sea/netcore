@@ -10,7 +10,7 @@
 #include "netaddr.h"
 namespace netcore
 {
-	class Connection :NonCopyable, std::enable_shared_from_this<Connection>
+	class Connection :NonCopyable, public std::enable_shared_from_this<Connection>
 	{
 	public:
 		enum Estate
@@ -24,6 +24,8 @@ namespace netcore
 		~Connection();
 
         int fd() const {return sock_.fd();}
+		bool isConnected() const { return state_ == Connected; }
+
 		void connectionEstablished();
 		void connectionDestroyed();
 
@@ -35,6 +37,9 @@ namespace netcore
 		void handleWritable();
 
 		void send(const char* buf, size_t count);
+
+		const NetAddr & getPeerAddr() const { return peeraddr_; }
+		const NetAddr & getLocalAddr() const { return localaddr_; }
 
 	private:
 		void sendInLoop(const char* buf, size_t count);

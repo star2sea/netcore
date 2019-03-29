@@ -9,7 +9,7 @@
 #include "connection.h"
 namespace netcore
 {
-	class Connector :NonCopyable, std::enable_shared_from_this<Connector>
+	class Connector :NonCopyable, public std::enable_shared_from_this<Connector>
 	{
 	public:
 		enum Estate
@@ -28,6 +28,7 @@ namespace netcore
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
 	private:
+		bool errnoIsWouldBlock(int err);
 		void onConnected();
 		void handleWritable();
 		void handleClosed();

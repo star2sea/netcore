@@ -26,6 +26,13 @@ namespace netcore
 		int fd() { return fd_; }
 
 		void remove() { assert(isNonEvent()); loop_->removeChannel(this); }
+		void reallocate(int fd)
+		{
+			if (fd_ == fd)
+				return;
+			remove();
+			fd_ = fd;
+		}
 
 		void enableReading() { evt_ |= EVT_R; update(); }
 		void enableWriting() { evt_ |= EVT_W; update(); }
@@ -53,7 +60,7 @@ namespace netcore
 		EventLoop * loop_;
         int evt_;
 		ReadableCallback readableCallback_;
-		WritableCallback writableCallback_;
+		WritableCallback writableCallback_; 
 	};
 }
 

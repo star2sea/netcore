@@ -12,8 +12,7 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 	peeraddr_(peeraddr),
 	localaddr_(sock_.getLocalAddr())
 {
-	connChannel_.setReadableCallback(std::bind(&Connection::handleReadable, this));
-	connChannel_.setWritableCallback(std::bind(&Connection::handleWritable, this));
+
 }
 
 Connection::~Connection()
@@ -28,7 +27,12 @@ void Connection::connectionEstablished()
 	state_ = Connected;
 
 	if (connectionCallback_)
-		connectionCallback_(shared_from_this());
+	{
+		connectionCallback_(shared_from_this());	
+	}
+		
+	connChannel_.setReadableCallback(std::bind(&Connection::handleReadable, shared_from_this()));
+	connChannel_.setWritableCallback(std::bind(&Connection::handleWritable, shared_from_this()));
 
 	connChannel_.enableReading();
 	if (output_.readAvailable() > 0)

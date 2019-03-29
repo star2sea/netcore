@@ -14,8 +14,6 @@ Acceptor::Acceptor(EventLoop * loop, const NetAddr &addr)
     sock_.setReuseAddr(true);
     sock_.setReusePort(true);
     sock_.setTcpNoDelay(true);
-    
-    acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, shared_from_this()));
 }
 
 Acceptor::~Acceptor()
@@ -26,8 +24,10 @@ Acceptor::~Acceptor()
 void Acceptor::startAccept()
 {
 	loop_->assertInOwnThread();
+	std::cout << "server bind " << addr_.toIpPort() << std::endl;
 	sock_.bind(addr_);
 	sock_.listen(1000);
+	acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, shared_from_this()));
 	acceptChannel_.enableReading();
 }
 

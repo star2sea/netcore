@@ -10,7 +10,7 @@ EventLoop::EventLoop()
 	tid_(std::this_thread::get_id()),
 	running_(false),
 	wakeupSock_(createWakeupFd()),
-	wakeupChannel_(new Channel(wakeupSock_.fd(), this))
+	wakeupChannel_(new Channel(wakeupFd_[1], this))
 {
 	wakeupChannel_->enableReading();
 }
@@ -89,39 +89,26 @@ void EventLoop::wakeup()
 
 int EventLoop::createWakeupFd()
 {
-	struct sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	int len = sizeof(addr);
-	int fd_1 = Socket::createSocket();
-	if (::bind(SOCKET_HANDLE(fd_1), (struct sockaddr*)&addr, len) < 0)
-	{
-		std::cout << "EventLoop::createWakeupFd bind error" << std::endl;
-		return -1;
-	}
-	if (::listen(SOCKET_HANDLE(fd_1), 5) < 0)
-	{
-		std::cout << "EventLoop::createWakeupFd listen error" << std::endl;
-		return -1;
-	}
+	NetAddr serveraddr("127.0.0.1",20000);
+	int len = static_cast<int>(sizeof(serveraddr.getAddr()));
+	Socket sock(Socket::createSocket());
+	sock.setReuseAddr(true);
 
-	if (::connect(SOCKET_HANDLE(fd_1), (struct sockaddr*)&addr, len) < 0)
-	{
-		std::cout << "EventLoop::createWakeupFd connect error" << std::endl;
-		return -1;
-	}
-	int fd_2 = ::accept(SOCKET_HANDLE(fd_1), (struct sockaddr*)&addr, &len);
-	if (fd_2 < 0)
-	{
-		std::cout << "EventLoop::createWakeupFd accept error" << std::endl;
-		return -1;
-	}
+	sock.bind(serveraddr);
+	sock.listen(5);
 
-	CLOSE_SOCKET(fd_1);
-	return fd_2;
+
+	Socket sock_0(Socket::createSocket());
+	wakeupFd_[0] = sock_0.fd();
+	sock_0.connect(serveraddr);
+
+	NetAddr peeraddr;
+	wakeupFd_[1] = sock.accept(&peeraddr);
+
+	sock.close();
+
+	return wakeupFd_[0];
 }
-
 
 Poller * EventLoop::defaultPoller()
 {

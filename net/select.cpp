@@ -41,33 +41,33 @@ void SelectPoller::poll()
 		Channel * channel = iter->second;
 		int fd = channel->fd();
 
-		if (channel->isReading()) 
+		if (channel->isReading())
 		{
-			FD_SET(fd, &rfds_);
-			maxfd_ = maxfd_ > fd ? maxfd_: fd;
+			FD_SET(SOCKET_HANDLE(fd), &rfds_);
+			maxfd_ = maxfd_ > fd ? maxfd_ : fd;
 		}
 
 		if (channel->isWriting())
 		{
-			FD_SET(fd, &wfds_);
+			FD_SET(SOCKET_HANDLE(fd), &wfds_);
 			maxfd_ = maxfd_ > fd ? maxfd_ : fd;
 		}
+	}
 		
-		activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, &tv);
+	activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, &tv);
 
-		if (activeNum_ > 0)
-		{
-			std::cout << "Select something happened" << std::endl;
-			handleActiveChannels();
-		}
-		else if (activeNum_ == 0)
-		{
-			std::cout << "Select nothing happened" << std::endl;
-		}
-		else
-		{
-			std::cout << "Select error" << std::endl; // errno == EINTR
-		}
+	if (activeNum_ > 0)
+	{
+		std::cout << "Select something happened, activeNum = " << activeNum_ << std::endl;
+		handleActiveChannels();
+	}
+	else if (activeNum_ == 0)
+	{
+		std::cout << "Select nothing happened" << std::endl;
+	}
+	else
+	{
+		std::cout << "Select error" << ERRNO << std::endl; // errno == EINTR
 	}
 }
 
@@ -103,13 +103,13 @@ void SelectPoller::handleActiveChannels()
 		Channel * channel = iter->second;
 		int fd = channel->fd();
 
-		if (FD_ISSET(fd, &rfds_)) 
+		if (FD_ISSET(SOCKET_HANDLE(fd), &rfds_)) 
 		{
 			channel->handleReadable();
 			fds.insert(fd);
 		}
 
-		if (FD_ISSET(fd, &wfds_))
+		if (FD_ISSET(SOCKET_HANDLE(fd), &wfds_))
 		{
 			channel->handleWritable();
 			fds.insert(fd);

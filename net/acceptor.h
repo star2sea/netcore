@@ -10,7 +10,7 @@
 #include <map>
 namespace netcore
 {
-	class Acceptor :NonCopyable, std::enable_shared_from_this<Acceptor>
+	class Acceptor : NonCopyable, public std::enable_shared_from_this<Acceptor>
 	{
 	public:
 		Acceptor(EventLoop * loop, const NetAddr &addr);
