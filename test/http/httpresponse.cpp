@@ -1,4 +1,5 @@
 #include "httpresponse.h"
+using namespace netcore;
 
 void HttpResponse::appendToBuffer(Buffer *buffer)
 {

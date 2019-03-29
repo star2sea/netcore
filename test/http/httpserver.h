@@ -9,7 +9,6 @@
 #include "../../net/callback.h"
 #include "../../net/buffer.h"
 #include "../../net/connection.h"
-using namespace netcore;
 
 class HttpServer : NonCopyable
 {

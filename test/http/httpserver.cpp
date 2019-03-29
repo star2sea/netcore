@@ -1,5 +1,5 @@
 #include "httpserver.h"
-
+using namespace netcore;
 
 HttpServer::HttpServer(EventLoop *loop, const NetAddr &addr, std::string &name)
 	:loop_(loop),

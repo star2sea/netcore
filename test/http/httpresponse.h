@@ -2,7 +2,7 @@
 #define __HTTP_RESPONSE_H
 #include "../../net/buffer.h"
 #include <map>
-using namespace netcore;
+#include <string>
 class HttpResponse
 {
 public:

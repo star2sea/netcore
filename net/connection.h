@@ -17,6 +17,7 @@ namespace netcore
 		{
 			Connecting,
 			Connected,
+			Disconnecting,
 			Disconnected
 		};
 
@@ -37,12 +38,17 @@ namespace netcore
 		void handleWritable();
 
 		void send(const char* buf, size_t count);
+		void send(Buffer &buffer);
+		void send(const std::string &str);
+
+		void shutdown();
 
 		const NetAddr & getPeerAddr() const { return peeraddr_; }
 		const NetAddr & getLocalAddr() const { return localaddr_; }
 
 	private:
 		void sendInLoop(const char* buf, size_t count);
+		void shutdownInLoop();
 		void handleClosed();
 
 	private:

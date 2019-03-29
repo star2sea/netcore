@@ -88,6 +88,10 @@ void Connection::handleWritable()
 		if (output_.readAvailable() == 0)
 		{
 			connChannel_.disableWriting();
+			if (state_ == Disconnecting)
+			{
+				shutdownInLoop();
+			}
 		}
 	}
 }
@@ -96,6 +100,24 @@ void Connection::handleClosed()
 {
 	loop_->assertInOwnThread();
 	closedCallback_(shared_from_this());
+}
+
+void Connection::shutdown()
+{
+	if (state_ == Connected)
+	{
+		state_ = Disconnecting;
+		loop_->runInLoop(std::bind(&Connection::shutdownInLoop, shared_from_this()));
+	}
+}
+
+void Connection::shutdownInLoop()
+{
+	loop_->assertInOwnThread();
+	if (!connChannel_.isWriting())
+	{
+		sock_.shutdown();
+	}
 }
 
 void Connection::send(const char* buf, size_t count)
@@ -110,6 +132,15 @@ void Connection::send(const char* buf, size_t count)
 	}
 }
 
+void Connection::send(Buffer &buffer)
+{
+	send(buffer.readBegin(), buffer.readAvailable());
+}
+
+void Connection::send(const std::string &str)
+{
+	send(&*str.begin(), str.size());
+}
 
 void Connection::sendInLoop(const char* buf, size_t count)
 {
