@@ -49,6 +49,8 @@ void Buffer::append(const char *buf, size_t n)
 
 void Buffer::append(const std::string &str)
 {
+	if (str.empty())
+		return;
 	append(&*str.begin(), str.size());
 }
 

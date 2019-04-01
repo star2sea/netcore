@@ -98,24 +98,39 @@ void SelectPoller::handleChangeChannels()
 void SelectPoller::handleActiveChannels()
 {
 	std::set<int> fds;
-	for (auto iter = channels_.cbegin(); iter != channels_.cend(); ++iter)
+
+	std::set<Channel *> rset;
+	std::set<Channel *> wset;
+
+	for (std::map<int, Channel*>::iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
 	{
 		Channel * channel = iter->second;
 		int fd = channel->fd();
 
 		if (FD_ISSET(SOCKET_HANDLE(fd), &rfds_)) 
 		{
-			channel->handleReadable();
+			rset.insert(channel);
+			//channel->handleReadable();
 			fds.insert(fd);
 		}
 
 		if (FD_ISSET(SOCKET_HANDLE(fd), &wfds_))
 		{
-			channel->handleWritable();
+			wset.insert(channel);
+			//channel->handleWritable();
 			fds.insert(fd);
 		}
 
 		if (fds.size() == activeNum_)
 			break;
+	}
+	for (auto &c : rset)
+	{
+		c->handleReadable();
+	}
+
+	for (auto & c : wset)
+	{
+		c->handleWritable();
 	}
 }

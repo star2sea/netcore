@@ -14,6 +14,7 @@ Acceptor::Acceptor(EventLoop * loop, const NetAddr &addr)
     sock_.setReuseAddr(true);
     sock_.setReusePort(true);
     sock_.setTcpNoDelay(true);
+	printf("acceptor fd = %d\n", sock_.fd());
 }
 
 Acceptor::~Acceptor()

@@ -19,6 +19,8 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 
 Connection::~Connection()
 {
+	loop_->assertInOwnThread();
+	printf("connection %d destroy\n", sock_.fd());
 	sock_.close();
 }
 
@@ -145,6 +147,8 @@ void Connection::send(Buffer &buffer)
 
 void Connection::send(const std::string &str)
 {
+	if (str.empty())
+		return;
 	send(&*str.begin(), str.size());
 }
 

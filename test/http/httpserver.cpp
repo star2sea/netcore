@@ -46,13 +46,13 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		assert(ctx_.find(fd) == ctx_.end());
-		std::cout << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
+		//std::cout << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
 		ctx_[fd] = HttpContext();
 	}
 	else
 	{
 		assert(ctx_.find(fd) != ctx_.end());
-		std::cout << "connction disconnected, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
+		//std::cout << "connction disconnected, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
 		ctx_.erase(fd);
 	}
 }
