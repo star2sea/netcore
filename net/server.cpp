@@ -3,7 +3,7 @@
 
 using namespace netcore;
 
-Server::Server(EventLoop *loop, const NetAddr & addr, std::string &name)
+Server::Server(EventLoop *loop, const NetAddr & addr, const std::string &name)
 	:loop_(loop),
 	addr_(addr),
 	name_(name),

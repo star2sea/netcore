@@ -63,7 +63,7 @@ void Connection::handleReadable()
 	}
 	else if (n < 0)
 	{
-		std::cout << "Connection::handleReadable error" << std::endl;
+		std::cout << "Connection::handleReadable error, " << ERRNO << std::endl;
 		handleClosed();
 	}
 	else
@@ -116,7 +116,8 @@ void Connection::shutdownInLoop()
 	loop_->assertInOwnThread();
 	if (!connChannel_.isWriting())
 	{
-		sock_.shutdown();
+		std::cout << "connection shutdown" << std::endl;
+		sock_.shutdownWrite();
 	}
 }
 

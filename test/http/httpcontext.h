@@ -12,8 +12,10 @@ public:
 		kExpectBody,
 		kDone,
 	};
+	
+	HttpContext() : state_(kExpectRequestLine) {}
 
-	bool parseRequest(Buffer* buf);
+	bool parseRequest(netcore::Buffer* buf);
 
 	bool parseDone() const { return state_ == kDone; }
 
@@ -30,8 +32,6 @@ public:
 
 private:
 	bool processRequestLine(const char* begin, const char* end);
-
-	HttpContext() : state_(kExpectRequestLine) {}
 
 private:
 	HttpRequestParseState state_;

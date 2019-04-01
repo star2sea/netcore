@@ -15,7 +15,7 @@ public:
 		k404NotFound = 404,
 	};
 
-	HttpResponse() : statusCode_(kUnknown) {}
+	HttpResponse() : statusCode_(kUnknown), connectionClose_(false) {}
 
 	void setStatusCode(HttpStatusCode code) { statusCode_ = code; }
 
@@ -27,11 +27,16 @@ public:
 
 	void addHeader(const std::string &k, const std::string &v) { headers_[k] = v; }
 
-	void appendToBuffer(Buffer *buffer);
+	void appendToBuffer(netcore::Buffer *buffer);
+
+	void setConnectionClose(bool on) { connectionClose_ = on; }
+
+	bool connectionClose()const { return connectionClose_; }
 
 private:
 	std::map<std::string, std::string> headers_;
 	HttpStatusCode statusCode_;
+	bool connectionClose_;
 	std::string statusMessage_;
 	std::string body_;
 };

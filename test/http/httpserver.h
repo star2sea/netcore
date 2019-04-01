@@ -10,11 +10,11 @@
 #include "../../net/buffer.h"
 #include "../../net/connection.h"
 
-class HttpServer : NonCopyable
+class HttpServer : netcore::NonCopyable
 {
 public:
 	typedef std::function<void(const HttpRequest &, HttpResponse *)> HttpCallback;
-	HttpServer(EventLoop *loop, const NetAddr &addr, std::string &name);
+	HttpServer(netcore::EventLoop *loop, const netcore::NetAddr &addr, const std::string &name);
 	~HttpServer();
 
 	void start(int threadnum = 0) { server_.start(threadnum); }
@@ -23,14 +23,14 @@ public:
 	void setHttpCallback(const HttpCallback &cb) { httpCallback_ = cb; }
 
 private:
-	void onRequest(const ConnectionPtr &conn, const HttpRequest &);
-	void onMessage(const ConnectionPtr &conn, Buffer &buffer);
-	void onConnection(const ConnectionPtr &conn);
+	void onRequest(const netcore::ConnectionPtr &conn, const HttpRequest &);
+	void onMessage(const netcore::ConnectionPtr &conn, netcore::Buffer &buffer);
+	void onConnection(const netcore::ConnectionPtr &conn);
 	void defalutHttpCallback(const HttpRequest &, HttpResponse *);
 
 private:
-	EventLoop *loop_;
-	Server server_;
+	netcore::EventLoop *loop_;
+	netcore::Server server_;
 	HttpCallback httpCallback_;
 	std::map<int, HttpContext> ctx_;
 };

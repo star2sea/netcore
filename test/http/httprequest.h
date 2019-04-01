@@ -1,5 +1,5 @@
 #ifndef __HTTP_REQUEST_H
-#define __HTTP_REQUESE_H
+#define __HTTP_REQUEST_H
 #include <string>
 #include <map>
 class HttpRequest
@@ -22,6 +22,8 @@ public:
 
 	bool setMethod(const char *start, const char *end);
 	Method method() const { return method_; }
+
+	const std::string methodName() const;
 
 	void setPath(const char *start, const char *end) { path_.assign(start, end); }
 

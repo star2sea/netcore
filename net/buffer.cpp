@@ -1,6 +1,9 @@
 #include "buffer.h"
 #include <assert.h>
+#include <algorithm>
 using namespace netcore;
+
+const char Buffer::CRLF[] = "\r\n";
 
 std::string Buffer::getAllAsString()
 {
@@ -13,6 +16,18 @@ void Buffer::consume(size_t n)
 {
 	assert(readAvailable() >= n);
 	readIndex_ += n;
+}
+
+void Buffer::consumeUntil(const char * until)
+{
+	int t = until - readBegin();
+	consume(t);
+}
+
+const char * Buffer::findCRLF() const
+{
+	const char * crlf = std::search(readBegin(), writeBegin(), CRLF, CRLF + 2);
+	return crlf == writeBegin() ? NULL : crlf;
 }
 
 void Buffer::append(const char *buf, size_t n)
@@ -30,6 +45,11 @@ void Buffer::append(const char *buf, size_t n)
 		std::copy(begin()+readIndex_, begin()+writeIndex_, begin());
 
 	}
+}
+
+void Buffer::append(const std::string &str)
+{
+	append(&*str.begin(), str.size());
 }
 
 void Buffer::ensureEnoughSpace(size_t n)

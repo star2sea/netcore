@@ -30,6 +30,33 @@ bool HttpRequest::setMethod(const char *start, const char *end)
 	return method_ != kInvalid;
 }
 
+const std::string HttpRequest::methodName() const
+{
+	switch (method_)
+	{
+	case kGet:
+		return "GET";
+		break;
+	case kPost:
+		return "POST";
+		break;
+	case kHead:
+		return "HEAD";
+		break;
+	case kPut:
+		return "PUT";
+		break;
+
+	case kDelete:
+		return "DELETE";
+		break;
+	case kInvalid:
+	default:
+		return "Unknown";
+		break;
+	}
+}
+
 void HttpRequest::addHeader(const char *start, const char * colon, const char * end)
 {
 	std::string field(start, colon);

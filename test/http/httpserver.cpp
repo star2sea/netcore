@@ -1,12 +1,14 @@
 #include "httpserver.h"
+#include <functional>
 using namespace netcore;
 
-HttpServer::HttpServer(EventLoop *loop, const NetAddr &addr, std::string &name)
+HttpServer::HttpServer(EventLoop *loop, const NetAddr &addr, const std::string &name)
 	:loop_(loop),
 	server_(loop, addr, name),
 	httpCallback_(std::bind(&HttpServer::defalutHttpCallback, this, std::placeholders::_1, std::placeholders::_2))
 {
-
+	server_.setConnectionCallback(std::bind(&HttpServer::onConnection, this, std::placeholders::_1));
+	server_.setMessageCallback(std::bind(&HttpServer::onMessage, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 HttpServer::~HttpServer()
@@ -23,8 +25,8 @@ void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 		conn->shutdown();
 	}
 
-	auto & http_ctx = ctx_[fd];
-	bool ret = http_ctx.parseRequest(buffer);
+	HttpContext & http_ctx = ctx_[fd];
+	bool ret = http_ctx.parseRequest(&buffer);
 	if (!ret)
 	{
 		conn->send("HTTP/1.1 404 Bad Request\r\n\r\n");
@@ -43,11 +45,13 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		assert(ctx_.find(fd) == ctx_.end());
+		std::cout << "httpserver new Connection" << std::endl;
 		ctx_[fd] = HttpContext();
 	}
 	else
 	{
 		assert(ctx_.find(fd) != ctx_.end());
+		std::cout << "httpserver Connection closed" << std::endl;
 		ctx_.erase(fd);
 	}
 }
@@ -56,11 +60,18 @@ void HttpServer::onRequest(const ConnectionPtr &conn, const HttpRequest &request
 {
 	HttpResponse response;
 	httpCallback_(request, &response);
-	conn->send(response.getBuf());
-	conn->shutdown();
+	Buffer buf(65536);
+	response.appendToBuffer(&buf);
+	conn->send(buf);
+	if (response.connectionClose())
+		conn->shutdown();
 }
 	
 void HttpServer::defalutHttpCallback(const HttpRequest &request, HttpResponse *response)
 {
-	
+	printf("http request Method %s\n", request.methodName().c_str());
+
+	response->setStatusCode(HttpResponse::k404NotFound);
+	response->setStatusMessage("Not Found");
+	response->setConnectionClose(false);
 }

@@ -14,7 +14,7 @@ namespace netcore
 	class Server :NonCopyable
 	{
 	public:
-		Server(EventLoop *loop, const NetAddr & addr, std::string &name);
+		Server(EventLoop *loop, const NetAddr & addr, const std::string &name);
 		~Server();
 
 		void start(int threadnum = 0);
