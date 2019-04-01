@@ -5,6 +5,21 @@
 #include "kqueue.h"
 using namespace netcore;
 
+#ifndef _WIN32
+namespace 
+{
+	class IgnoreSigPipe
+	{
+	public:
+		IgnoreSigPipe()
+		{
+			::signal(SIGPIPE, SIG_IGN);
+		}
+	};
+	IgnoreSigPipe initObj;
+}
+#endif
+
 EventLoop::EventLoop()
 	:poller_(defaultPoller()),
 	tid_(std::this_thread::get_id()),

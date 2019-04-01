@@ -54,11 +54,11 @@ void SelectPoller::poll()
 		}
 	}
 		
-	activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, &tv);
+	activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, NULL);
 
 	if (activeNum_ > 0)
 	{
-		std::cout << "Select something happened, activeNum = " << activeNum_ << std::endl;
+		//std::cout << "Select something happened, activeNum = " << activeNum_ << std::endl;
 		handleActiveChannels();
 	}
 	else if (activeNum_ == 0)

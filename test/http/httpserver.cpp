@@ -1,5 +1,6 @@
 #include "httpserver.h"
 #include <functional>
+#include "../../utils/timestamp.h"
 using namespace netcore;
 
 HttpServer::HttpServer(EventLoop *loop, const NetAddr &addr, const std::string &name)
@@ -45,13 +46,13 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		assert(ctx_.find(fd) == ctx_.end());
-		std::cout << "httpserver new Connection" << std::endl;
+		std::cout << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
 		ctx_[fd] = HttpContext();
 	}
 	else
 	{
 		assert(ctx_.find(fd) != ctx_.end());
-		std::cout << "httpserver Connection closed" << std::endl;
+		std::cout << "connction disconnected, peeraddr " << conn->getPeerAddr().toIpPort() << " " << TimeStamp::now() << std::endl;
 		ctx_.erase(fd);
 	}
 }
@@ -69,9 +70,7 @@ void HttpServer::onRequest(const ConnectionPtr &conn, const HttpRequest &request
 	
 void HttpServer::defalutHttpCallback(const HttpRequest &request, HttpResponse *response)
 {
-	printf("http request Method %s\n", request.methodName().c_str());
-
-	response->setStatusCode(HttpResponse::k404NotFound);
-	response->setStatusMessage("Not Found");
+	response->setStatusCode(HttpResponse::k200Ok);
+	response->setStatusMessage("OK");
 	response->setConnectionClose(false);
 }

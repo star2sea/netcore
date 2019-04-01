@@ -1,5 +1,6 @@
 #include "socket.h"
 #include <iostream>
+#include "../utils/timestamp.h"
 using namespace netcore;
 
 void Socket::setNonBlocking(int fd)
@@ -81,11 +82,17 @@ ssize_t Socket::write(const char* buf, size_t len)
 
 void Socket::close()
 {
+	NetAddr addr(getPeerAddr());
+	printf("socket %s close\n", addr.toIpPort().c_str());
+	
 	CLOSE_SOCKET(sockfd_);
 }
 
 void Socket::shutdown()
 {
+	NetAddr addr(getPeerAddr());
+	printf("socket %s shutdown\n", addr.toIpPort().c_str());
+
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_BOTH);
 #else
@@ -95,6 +102,9 @@ void Socket::shutdown()
 
 void Socket::shutdownRead()
 {
+	NetAddr addr(getPeerAddr());
+	printf("socket %s shutdownRead\n", addr.toIpPort().c_str());
+
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_RECEIVE);
 #else
@@ -104,6 +114,8 @@ void Socket::shutdownRead()
 
 void Socket::shutdownWrite()
 {
+	NetAddr addr(getPeerAddr());
+	printf("socket %s shutdownWrite\n", addr.toIpPort().c_str());
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_SEND);
 #else

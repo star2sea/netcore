@@ -61,6 +61,7 @@ namespace netcore
 		NetAddr peeraddr_;
 		NetAddr localaddr_;
 
+
 		MessageCallback messageCallback_;
 		ConnectionCallback connectionCallback_;
 		ClosedCallback closedCallback_;

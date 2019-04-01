@@ -1,5 +1,6 @@
 #include "connection.h"
 #include "channel.h"
+#include "../utils/timestamp.h"
 using namespace netcore;
 
 Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
@@ -12,7 +13,8 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 	peeraddr_(peeraddr),
 	localaddr_(sock_.getLocalAddr())
 {
-
+	sock_.setTcpNoDelay(true);
+	sock_.setKeepAlive(true);
 }
 
 Connection::~Connection()
@@ -31,8 +33,8 @@ void Connection::connectionEstablished()
 		connectionCallback_(shared_from_this());	
 	}
 		
-	connChannel_.setReadableCallback(std::bind(&Connection::handleReadable, shared_from_this()));
-	connChannel_.setWritableCallback(std::bind(&Connection::handleWritable, shared_from_this()));
+	connChannel_.setReadableCallback(std::bind(&Connection::handleReadable, this));
+	connChannel_.setWritableCallback(std::bind(&Connection::handleWritable, this));
 
 	connChannel_.enableReading();
 	if (output_.readAvailable() > 0)
@@ -47,6 +49,7 @@ void Connection::connectionDestroyed()
 	state_ = Disconnected;
     
     connChannel_.disableAll();
+	connChannel_.remove();
     
     if (connectionCallback_)
         connectionCallback_(shared_from_this());
@@ -57,13 +60,15 @@ void Connection::handleReadable()
 	loop_->assertInOwnThread();
 	char buf[1024];
 	ssize_t n = sock_.read(buf, 1024);
+
 	if (n == 0)
 	{
+		std::cout << "connection " << getPeerAddr().toIpPort() << " read 0, close" << std::endl;
 		handleClosed();
 	}
 	else if (n < 0)
 	{
-		std::cout << "Connection::handleReadable error, " << ERRNO << std::endl;
+		std::cout << "Connection::handleReadable error, ------ peeradder ------" << getPeerAddr().toIpPort() << " errno = " << ERRNO << std::endl;
 		handleClosed();
 	}
 	else

@@ -27,7 +27,7 @@ void Acceptor::startAccept()
 	std::cout << "server bind " << addr_.toIpPort() << std::endl;
 	sock_.bind(addr_);
 	sock_.listen(1000);
-	acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, shared_from_this()));
+	acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, this));
 	acceptChannel_.enableReading();
 }
 
