@@ -1,4 +1,5 @@
 #include "connector.h"
+#include "../utils/logger.h"
 
 using namespace netcore;
 
@@ -22,14 +23,11 @@ void Connector::connect(const NetAddr & serveraddr)
 	connectorChannel_.setWritableCallback(std::bind(&Connector::handleWritable, shared_from_this()));
 	sock_ = Socket::createNonBlockingSocket();
 
-	NetAddr localaddr(sock_.getLocalAddr());
-	std::cout << "connector sock " << localaddr.toIpPort() << std::endl;
-
 	int err = 0;
 	int ret = 0;
 
 	do {
-		std::cout << "start connect to server " << serveraddr.toIpPort() << std::endl;
+		LOG_INFO << "start connect to server " << serveraddr.toIpPort();
 		ret = sock_.connect(serveraddr);
 		err = ERRNO;
 	} while (ret < 0 && (err == EAGAIN || err == EADDRINUSE || err == ECONNREFUSED));
@@ -44,7 +42,7 @@ void Connector::connect(const NetAddr & serveraddr)
 		}
 		else
 		{
-			std::cout << "Connector::connect error " << ERRNO << " ret = " << ret << std::endl;
+			LOG_ERROR << "Connector::connect error " << ERRNO << " ret = " << ret;
 			sock_.close();
 			return;
 		}
@@ -66,7 +64,6 @@ bool Connector::errnoIsWouldBlock(int err)
 
 void Connector::onConnected()
 {
-	std::cout << "Connector:: onConnected" << std::endl;
 	state_ = Connected;
 	connectorChannel_.disableWriting();
 
@@ -86,7 +83,7 @@ void Connector::handleWritable()
 		int err = sock_.getSocketError();
 		if (err)
 		{
-			std::cout << "Connector::handleWritable error" << std::endl;
+			//todo
 			sock_.close();
 			return;
 		}

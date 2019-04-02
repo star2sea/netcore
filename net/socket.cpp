@@ -1,6 +1,7 @@
 #include "socket.h"
 #include <iostream>
 #include "../utils/timestamp.h"
+#include "../utils/logger.h"
 using namespace netcore;
 
 void Socket::setNonBlocking(int fd)
@@ -9,7 +10,7 @@ void Socket::setNonBlocking(int fd)
 	u_long ul = 1;
 	if (ioctlsocket(SOCKET_HANDLE(fd), FIONBIO, &ul) == SOCKET_ERROR)
 	{
-		std::cout << "ioctlsocket failed with error " << ERRNO << std::endl;
+		LOG_ERROR << "ioctlsocket failed with error " << ERRNO;
 	}
 #else
 	auto flags = fcntl(fd, F_GETFL, 0);
@@ -34,7 +35,7 @@ void Socket::listen(int backlog)
 {
 	if (::listen(SOCKET_HANDLE(sockfd_), backlog) < 0)
 	{
-		std::cout << "Socket::listen error " << ERRNO << std::endl;
+		LOG_ERROR << "Socket::listen error " << ERRNO;
 	}
 }
 
@@ -42,7 +43,7 @@ void Socket::bind(const NetAddr & addr)
 {
 	if (::bind(SOCKET_HANDLE(sockfd_), addr.toSockAddr(), sizeof addr) < 0)
 	{
-		std::cout << "Socket::bind error " << ERRNO << std::endl;
+		LOG_ERROR << "Socket::bind error " << ERRNO;
 	}
 }
 
@@ -52,7 +53,7 @@ int Socket::accept(NetAddr *peeraddr)
 	int connfd = SOCKET_FD(::accept(SOCKET_HANDLE(sockfd_), peeraddr->toSockAddr(), &addrlen));
 	if (connfd < 0)
 	{
-		std::cout << "Socket::accept error" << std::endl;
+		LOG_ERROR << "Socket::accept error";
 	}
 	return connfd;
 }
@@ -83,16 +84,11 @@ ssize_t Socket::write(const char* buf, size_t len)
 void Socket::close()
 {
 	NetAddr addr(getPeerAddr());
-	printf("socket %s close\n", addr.toIpPort().c_str());
-	
 	CLOSE_SOCKET(sockfd_);
 }
 
 void Socket::shutdown()
 {
-	NetAddr addr(getPeerAddr());
-	printf("socket %s shutdown\n", addr.toIpPort().c_str());
-
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_BOTH);
 #else
@@ -102,9 +98,6 @@ void Socket::shutdown()
 
 void Socket::shutdownRead()
 {
-	NetAddr addr(getPeerAddr());
-	printf("socket %s shutdownRead\n", addr.toIpPort().c_str());
-
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_RECEIVE);
 #else
@@ -114,8 +107,6 @@ void Socket::shutdownRead()
 
 void Socket::shutdownWrite()
 {
-	NetAddr addr(getPeerAddr());
-	printf("socket %s shutdownWrite\n", addr.toIpPort().c_str());
 #ifdef _WIN32
 	::shutdown(SOCKET_HANDLE(sockfd_), SD_SEND);
 #else

@@ -20,7 +20,6 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 Connection::~Connection()
 {
 	loop_->assertInOwnThread();
-	printf("connection %d destroy\n", sock_.fd());
 	sock_.close();
 }
 
@@ -65,12 +64,11 @@ void Connection::handleReadable()
 
 	if (n == 0)
 	{
-		std::cout << "connection " << getPeerAddr().toIpPort() << " read 0, close" << std::endl;
 		handleClosed();
 	}
 	else if (n < 0)
 	{
-		std::cout << "Connection::handleReadable error, ------ peeradder ------" << getPeerAddr().toIpPort() << " errno = " << ERRNO << std::endl;
+		// todo
 		handleClosed();
 	}
 	else
@@ -87,7 +85,7 @@ void Connection::handleWritable()
 	ssize_t n = sock_.write(output_.readBegin(), output_.readAvailable());
 	if (n < 0)
 	{
-		std::cout << "Connection::handleWritable error" << std::endl;
+		//todo
 	}
 	else
 	{
@@ -123,7 +121,6 @@ void Connection::shutdownInLoop()
 	loop_->assertInOwnThread();
 	if (!connChannel_.isWriting())
 	{
-		std::cout << "connection shutdown" << std::endl;
 		sock_.shutdownWrite();
 	}
 }
@@ -167,7 +164,7 @@ void Connection::sendInLoop(const char* buf, size_t count)
 		ssize_t n = sock_.write(buf, count);
 		if (n < 0)
 		{
-			std::cout << "Connection::sendInLoop error" << std::endl;
+			//todo
 			output_.append(buf, count);
 		}
 		else if (n < count)

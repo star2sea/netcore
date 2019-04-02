@@ -12,7 +12,7 @@ namespace netcore
 			DEBUG,
 			INFO,
 			WARN,
-			ERROR,
+			ERR,
 			FATAL,
 			NUM_LOG_LEVELS,
 		};

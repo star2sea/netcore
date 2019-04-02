@@ -3,6 +3,7 @@
 #include "select.h"
 #include "epoll.h"
 #include "kqueue.h"
+#include "../utils/logger.h"
 using namespace netcore;
 
 #ifndef _WIN32
@@ -98,7 +99,7 @@ void EventLoop::wakeup()
 	ssize_t n = wakeupSock_.write(&one, sizeof one);
 	if (n != sizeof one)
 	{
-		std::cout << "EventLoop::wakeup error" << std::endl;
+		LOG_ERROR << "EventLoop::wakeup error";
 	}
 }
 

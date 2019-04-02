@@ -2,6 +2,7 @@
 #include "socket.h"
 #include <iostream>
 #include <cstring> //memset
+#include "../utils/logger.h"
 
 using namespace netcore;
 
@@ -12,7 +13,7 @@ NetAddr::NetAddr(const char *ip, short port)
 	addr_.sin_port = htons(port);
 	if (inet_pton(AF_INET, ip, &addr_.sin_addr.s_addr) < 0)
 	{
-		std::cout << "InetAddr::InetAddr error, invalid ip address" << std::endl;
+		LOG_ERROR << "InetAddr::InetAddr error, invalid ip address";
 	}
 }
 

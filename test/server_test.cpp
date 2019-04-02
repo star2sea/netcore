@@ -3,6 +3,7 @@
 #include "../net/netaddr.h"
 #include "../net/callback.h"
 #include "../net/connection.h"
+#include "../utils/logger.h"
 #include <functional>
 
 #ifdef _WIN32
@@ -26,20 +27,20 @@ public:
 	void onMessage(const ConnectionPtr &conn, Buffer &buf)
 	{
 		std::string msg = buf.getAllAsString();
-		std::cout << "new msg: " << msg << std::endl;
+		LOG_INFO << "new msg: " << msg;
 	}
 
 	void onConnection(const ConnectionPtr &conn)
 	{
 		if (conn->isConnected())
 		{
-			std::cout << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << 
-				" localaddr " << conn->getLocalAddr().toIpPort() << std::endl;
+			LOG_INFO << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << 
+				" localaddr " << conn->getLocalAddr().toIpPort();
 		}
 		else
 		{
-			std::cout << "connction disconnected, peeraddr " << conn->getPeerAddr().toIpPort() << 
-				" localaddr " << conn->getLocalAddr().toIpPort() << std::endl;
+			LOG_INFO << "connction disconnected, peeraddr " << conn->getPeerAddr().toIpPort() << 
+				" localaddr " << conn->getLocalAddr().toIpPort();
 		}
 	}
 private:

@@ -1,6 +1,7 @@
 #include "acceptor.h"
 #include "channel.h"
 #include "connection.h"
+#include "../utils/logger.h"
 
 using namespace netcore;
 
@@ -14,7 +15,6 @@ Acceptor::Acceptor(EventLoop * loop, const NetAddr &addr)
     sock_.setReuseAddr(true);
     sock_.setReusePort(true);
     sock_.setTcpNoDelay(true);
-	printf("acceptor fd = %d\n", sock_.fd());
 }
 
 Acceptor::~Acceptor()
@@ -25,7 +25,7 @@ Acceptor::~Acceptor()
 void Acceptor::startAccept()
 {
 	loop_->assertInOwnThread();
-	std::cout << "server bind " << addr_.toIpPort() << std::endl;
+	LOG_INFO << "server bind " << addr_.toIpPort() << " and start listen";
 	sock_.bind(addr_);
 	sock_.listen(1000);
 	acceptChannel_.setReadableCallback(std::bind(&Acceptor::handleReadable, this));
@@ -72,7 +72,7 @@ void Acceptor::handleReadable()
 	}
 	else
 	{
-		std::cout << "Acceptor::handleReadable error" << std::endl;
+		//todo
 	}
 }
 

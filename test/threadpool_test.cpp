@@ -1,4 +1,5 @@
 #include "../utils/threadpool.h"
+#include "../utils/logger.h"
 #ifdef _WIN32
 #include <Windows.h>
 #define SLEEP_MS(ms) Sleep(ms)
@@ -11,7 +12,7 @@ using namespace netcore;
 
 void test(int i)
 {
-	std::cout << i * i << std::endl;
+	LOG_INFO << i * i;
 }
 
 int main(int argc, char *argv[])

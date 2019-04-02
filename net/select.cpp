@@ -1,5 +1,6 @@
 #include "select.h"
 #include "channel.h"
+#include "../utils/logger.h"
 #include <stdio.h>
 using namespace netcore;
 
@@ -58,16 +59,16 @@ void SelectPoller::poll()
 
 	if (activeNum_ > 0)
 	{
-		//std::cout << "Select something happened, activeNum = " << activeNum_ << std::endl;
 		handleActiveChannels();
 	}
 	else if (activeNum_ == 0)
 	{
-		std::cout << "Select nothing happened" << std::endl;
+		LOG_INFO << "Select nothing happened";
 	}
 	else
 	{
-		std::cout << "Select error" << ERRNO << std::endl; // errno == EINTR
+		if (ERRNO != EINTR)
+			LOG_ERROR << "Select error " << ERRNO; 
 	}
 }
 
