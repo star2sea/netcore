@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ctime>
 #include <iomanip>
+#include <string>
 
 namespace netcore
 {
@@ -28,6 +29,16 @@ namespace netcore
 			auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(ts.tp_.time_since_epoch()).count() % 1000;
 			auto t = std::chrono::system_clock::to_time_t(ts.tp_);
 			return os << std::put_time(std::localtime(&t), "%Y%m%d %H:%M:%S.") << std::setfill('0') << std::setw(3) << ms;
+		}
+	
+		const std::string toFormatString() const
+		{
+			auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp_.time_since_epoch()).count() % 1000;
+			auto t = std::chrono::system_clock::to_time_t(tp_);
+			char fmt[100];
+			auto tm = std::localtime(&t);
+			std::strftime(fmt, sizeof fmt, "%Y%m%d %H:%M:%S.", tm);
+			return strcat(fmt, std::to_string(ms).c_str());
 		}
 
 	private:
