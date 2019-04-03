@@ -69,8 +69,8 @@ void SelectPoller::poll()
 	}
 	else
 	{
-		if (ERRNO != EINTR)
-			LOG_ERROR << "Select error, errno = " << ERRNO; 
+		/*if (ERRNO != EINTR)
+			LOG_ERROR << "Select error, errno = " << ERRNO; */
 	}
 }
 
