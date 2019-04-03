@@ -33,7 +33,6 @@ EventLoop::EventLoop()
 	wakeupChannel_ = std::unique_ptr<Channel>(new Channel(wakeupSock_[1].fd(), this));
 	wakeupChannel_->setReadableCallback(std::bind(&EventLoop::onWakeup, this));
 	wakeupChannel_->enableReading();
-	wakeup();
 }
 
 EventLoop::~EventLoop()
