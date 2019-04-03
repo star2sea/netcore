@@ -30,6 +30,7 @@ namespace netcore
 		{
 			if (fd_ == fd)
 				return;
+			disableAll();
 			remove();
 			fd_ = fd;
 		}

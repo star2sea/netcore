@@ -27,16 +27,19 @@ namespace
 EventLoop::EventLoop()
 	:poller_(defaultPoller()),
 	tid_(std::this_thread::get_id()),
-	running_(false),
-	wakeupSock_(createWakeupFd()),
-	wakeupChannel_(new Channel(wakeupFd_[1], this))
+	running_(false)
 {
+	createWakeupFd();
+	wakeupChannel_ = std::unique_ptr<Channel>(new Channel(wakeupSock_[1].fd(), this));
+	wakeupChannel_->setReadableCallback(std::bind(&EventLoop::onWakeup, this));
 	wakeupChannel_->enableReading();
+	wakeup();
 }
 
 EventLoop::~EventLoop()
 {
-	wakeupSock_.close();
+	wakeupSock_[0].close();
+	wakeupSock_[1].close();
 }
 
 void EventLoop::loop()
@@ -96,47 +99,53 @@ void EventLoop::runInLoop(const Func &cb)
 	}
 }
 
-void EventLoop::wakeup()
+void EventLoop::onWakeup()
 {
-	char one = ' ';
-	ssize_t n = wakeupSock_.write(&one, sizeof one);
+	char one[1];
+	ssize_t n = wakeupSock_[1].read(one, sizeof one);
 	if (n != sizeof one)
 	{
-		LOG_ERROR << "EventLoop::wakeup error, errno = " << ERRNO << " " << wakeupSock_.fd();
+		LOG_ERROR << "EventLoop::onWakeup error, errno = " << ERRNO;
+	}
+	else
+	{
+		LOG_INFO << "EventLoop onWakeup";
 	}
 }
 
-//void EventLoop::createWakeupFdCallback(int wakeupFd)
-//{
-//	assertInOwnThread();
-//	wakeupChannel_ = std::unique_ptr<Channel>(new Channel(wakeupFd, this));
-//	wakeupChannel_->enableReading();
-//}
+void EventLoop::wakeup()
+{
+	char one = ' ';
+	ssize_t n = wakeupSock_[0].write(&one, sizeof one);
+	if (n != sizeof one)
+	{
+		LOG_ERROR << "EventLoop::wakeup error, errno = " << ERRNO;
+	}
+}
 
 int EventLoop::createWakeupFd()
 {
-	std::ostringstream oss;
-	oss << tid_;
-	std::string stid = oss.str();
-	unsigned long long tid = std::stoull(stid);
-
-	short port = (tid % 1000) + 20000;
-	
-	NetAddr serveraddr("127.0.0.1", port);
+	NetAddr serveraddr("127.0.0.1", 0);
 	int len = static_cast<int>(sizeof(serveraddr.getAddr()));
 	Socket serv(Socket::createSocket());
 
 	serv.bind(serveraddr);
 	serv.listen(1);
 
-	Socket sock_0(Socket::createSocket());
-	wakeupFd_[0] = sock_0.fd();
-	sock_0.connect(serveraddr);
+	serveraddr = serv.getLocalAddr();
 
-	wakeupFd_[1] = serv.accept(NULL);
+	wakeupSock_[0] = Socket::createSocket();
+
+	wakeupSock_[0].connect(serveraddr);
+
+	wakeupSock_[1] = serv.accept(NULL);
+
+	Socket::setNonBlocking(wakeupSock_[0].fd());
+	Socket::setNonBlocking(wakeupSock_[1].fd());
+
 	serv.close();
 
-	return wakeupFd_[0];
+	return 0;
 }
 
 //int EventLoop::createWakeupFd()
@@ -187,6 +196,13 @@ int EventLoop::createWakeupFd()
 //		}
 //	});
 //	return 0;
+//}
+
+//void EventLoop::createWakeupFdCallback(int wakeupFd)
+//{
+//	assertInOwnThread();
+//	wakeupChannel_ = std::unique_ptr<Channel>(new Channel(wakeupFd, this));
+//	wakeupChannel_->enableReading();
 //}
 
 Poller * EventLoop::defaultPoller()

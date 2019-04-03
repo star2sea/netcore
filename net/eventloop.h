@@ -40,13 +40,13 @@ namespace netcore
 		void quitInLoop();
 		int createWakeupFd();
 		void wakeup();
+		void onWakeup();
 
 	private:
 		std::unique_ptr<Poller> poller_;
 		std::thread::id tid_;
         bool running_;
-		Socket wakeupSock_;
-		int wakeupFd_[2];
+		Socket wakeupSock_[2];
 		std::unique_ptr<Channel> wakeupChannel_;
 		BlockingQueue<Func> pendingFuncs_;
 		
