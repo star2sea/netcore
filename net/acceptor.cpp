@@ -72,7 +72,10 @@ void Acceptor::handleReadable()
 	}
 	else
 	{
-		//todo
+		if (ERRNO == EMFILE)
+		{
+			//todo
+		}
 	}
 }
 

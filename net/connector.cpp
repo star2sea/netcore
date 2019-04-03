@@ -26,14 +26,14 @@ void Connector::connect(const NetAddr & serveraddr)
 	int err = 0;
 	int ret = 0;
 
-	do {
-		LOG_INFO << "start connect to server " << serveraddr.toIpPort();
-		ret = sock_.connect(serveraddr);
-		err = ERRNO;
-	} while (ret < 0 && (err == EAGAIN || err == EADDRINUSE || err == ECONNREFUSED));
-
+	
+	LOG_INFO << "start connect to server " << serveraddr.toIpPort();
+	ret = sock_.connect(serveraddr);
+	
 	if (ret < 0)
 	{
+		err = ERRNO;
+
 		if (errnoIsWouldBlock(err))
 		{
 			state_ = Connecting;
@@ -42,7 +42,7 @@ void Connector::connect(const NetAddr & serveraddr)
 		}
 		else
 		{
-			LOG_ERROR << "Connector::connect error " << ERRNO << " ret = " << ret;
+			LOG_ERROR << "Connector::connect error, errno = " << err;
 			sock_.close();
 			return;
 		}
@@ -83,7 +83,7 @@ void Connector::handleWritable()
 		int err = sock_.getSocketError();
 		if (err)
 		{
-			//todo
+			LOG_ERROR << "Connector::handleWritable error, errno = " << err;
 			sock_.close();
 			return;
 		}

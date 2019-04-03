@@ -68,7 +68,7 @@ void Connection::handleReadable()
 	}
 	else if (n < 0)
 	{
-		// todo
+		
 		handleClosed();
 	}
 	else
@@ -85,7 +85,7 @@ void Connection::handleWritable()
 	ssize_t n = sock_.write(output_.readBegin(), output_.readAvailable());
 	if (n < 0)
 	{
-		//todo
+		handleClosed();
 	}
 	else
 	{
@@ -164,8 +164,7 @@ void Connection::sendInLoop(const char* buf, size_t count)
 		ssize_t n = sock_.write(buf, count);
 		if (n < 0)
 		{
-			//todo
-			output_.append(buf, count);
+			handleClosed();
 		}
 		else if (n < count)
 		{

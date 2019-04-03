@@ -7,7 +7,11 @@ using namespace netcore;
 void SelectPoller::updateChannel(Channel *channel)
 {
 	loop_->assertInOwnThread();
-	changes_.insert(channel);
+	int fd = channel->fd();
+	if (channels_.find(fd) == channels_.end())
+	{
+		channels_[fd] = channel;
+	}
 }
 
 void SelectPoller::removeChannel(Channel *channel)
@@ -34,8 +38,6 @@ void SelectPoller::poll()
 	struct timeval tv;
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
-
-	handleChangeChannels();
 
 	for (auto iter = channels_.cbegin(); iter != channels_.cend(); ++iter)
 	{
@@ -68,38 +70,12 @@ void SelectPoller::poll()
 	else
 	{
 		if (ERRNO != EINTR)
-			LOG_ERROR << "Select error " << ERRNO; 
+			LOG_ERROR << "Select error, errno = " << ERRNO; 
 	}
-}
-
-// 如果更新的时候，不删除，貌似没有必要使用changes_ todo
-void SelectPoller::handleChangeChannels()
-{
-	for (auto iter = changes_.cbegin(); iter != changes_.cend(); ++iter)
-	{
-		Channel * channel = *iter;
-		int fd = channel->fd();
-		//bool nonEvt = channel->isNonEvent();
-		if (channels_.find(fd) == channels_.end())
-		{
-			//if (!nonEvt)
-			channels_[fd] = channel;
-		}
-		/*else
-		{
-			if (nonEvt)
-			{
-				channels_.erase(fd);
-			}
-		}*/
-	}
-	changes_.clear();
 }
 
 void SelectPoller::handleActiveChannels()
 {
-	std::set<int> fds;
-
 	std::set<Channel *> rset;
 	std::set<Channel *> wset;
 
@@ -111,18 +87,14 @@ void SelectPoller::handleActiveChannels()
 		if (FD_ISSET(SOCKET_HANDLE(fd), &rfds_)) 
 		{
 			rset.insert(channel);
-			//channel->handleReadable();
-			fds.insert(fd);
 		}
 
 		if (FD_ISSET(SOCKET_HANDLE(fd), &wfds_))
 		{
 			wset.insert(channel);
-			//channel->handleWritable();
-			fds.insert(fd);
 		}
 
-		if (fds.size() == activeNum_)
+		if ((rset.size() + wset.size()) == activeNum_)
 			break;
 	}
 	for (auto &c : rset)

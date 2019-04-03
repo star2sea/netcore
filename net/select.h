@@ -21,7 +21,6 @@ namespace netcore
 		void removeChannel(Channel *) override;
 		void poll() override;
 	private:
-		void handleChangeChannels();
 		void handleActiveChannels() override;
 	private:
 		int maxfd_;
