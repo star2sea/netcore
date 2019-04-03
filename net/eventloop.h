@@ -33,7 +33,7 @@ namespace netcore
 
 		void assertInOwnThread() { assert(inOwnThread()); }
 
-		void createWakeupFdCallback(int wakeupFd);
+		//void createWakeupFdCallback(int wakeupFd);
 
 	private:
 		Poller * defaultPoller();
