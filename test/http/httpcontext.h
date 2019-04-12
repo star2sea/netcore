@@ -1,42 +1,25 @@
 #ifndef __HTTP_CONTEXT_H
 #define __HTTP_CONTEXT_H
 #include "../../net/buffer.h"
-#include "httprequest.h"
+#include "http_parser/httpparser.h"
 class HttpContext
 {
 public:
-	enum HttpRequestParseState
-	{
-		kExpectRequestLine,
-		kExpectHeaders,
-		kExpectBody,
-		kDone,
-	};
-	
-	HttpContext() : state_(kExpectRequestLine) {}
+	HttpContext();
 
-	bool parseRequest(netcore::Buffer* buf);
+	bool parse(netcore::Buffer* buf);
 
-	bool parseDone() const { return state_ == kDone; }
+	void reset() { request_.reset(); parseError_ = false; parseDone_ = false; }
 
-	void reset() 
-	{
-		state_ = kExpectRequestLine;
-		HttpRequest dummy;
-		request_.swap(dummy);
-	}
+	bool parseDone() const { return parseDone_; }
 
-	const HttpRequest& request() const { return request_; }
-
-	HttpRequest& request() {return request_;}
+	httpparser::HttpRequest request() const { return request_; }
 
 private:
-	bool processRequestLine(const char* begin, const char* end);
-
-private:
-	HttpRequestParseState state_;
-	HttpRequest request_;
-
+	httpparser::HttpRequest request_;
+	httpparser::HttpParser parser_;
+	bool parseError_;
+	bool parseDone_;
 };
 
 #endif

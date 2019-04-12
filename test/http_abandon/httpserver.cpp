@@ -26,7 +26,7 @@ void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 	}
 
 	HttpContext & http_ctx = ctx_[fd];
-	bool ret = http_ctx.parse(&buffer);
+	bool ret = http_ctx.parseRequest(&buffer);
 	if (!ret)
 	{
 		conn->send("HTTP/1.1 404 Bad Request\r\n\r\n");
@@ -34,13 +34,7 @@ void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 	}
 	else if (http_ctx.parseDone())
 	{
-		httpparser::HttpResponse response;
-		httpCallback_(http_ctx.request(), &response);
-		Buffer buf(65536);
-		buf.append(response.toStr());
-		conn->send(buf);
-		if (!response.getKeepAlive())
-			conn->shutdown();
+		onRequest(conn, http_ctx.request());
 		http_ctx.reset();
 	}
 }
@@ -60,9 +54,20 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	}
 }
 
-void HttpServer::defalutHttpCallback(const httpparser::HttpRequest &request, httpparser::HttpResponse * response)
+void HttpServer::onRequest(const ConnectionPtr &conn, const HttpRequest &request)
 {
-	response->setStatus(HTTP_STATUS_OK);
-	response->setKeepAlive(true, true);
-	response->setBody(std::string("hello"), true);
+	HttpResponse response;
+	httpCallback_(request, &response);
+	Buffer buf(65536);
+	response.appendToBuffer(&buf);
+	conn->send(buf);
+	if (response.connectionClose())
+		conn->shutdown();
+}
+	
+void HttpServer::defalutHttpCallback(const HttpRequest &request, HttpResponse *response)
+{
+	response->setStatusCode(HttpResponse::k200Ok);
+	response->setStatusMessage("OK");
+	response->setConnectionClose(false);
 }

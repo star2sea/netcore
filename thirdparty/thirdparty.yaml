@@ -1,0 +1,14 @@
+source: source
+build: build
+install: install
+
+cmake_args:
+  - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  
+thirdparty:
+    ninja: # must
+        git: https://github.com/ninja-build/ninja
+        tag: v1.9.0
+    
+    http_parser:
+       git: https://github.com/star2sea/http-parser.git
