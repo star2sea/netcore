@@ -12,7 +12,7 @@
 class HttpServer : netcore::NonCopyable
 {
 public:
-	typedef std::function<void(const httpparser::HttpRequest &, httpparser::HttpResponse * response)> HttpCallback;
+	typedef std::function<void(const httpparser::HttpMessage *, httpparser::HttpResponse *)> HttpCallback;
 
 	HttpServer(netcore::EventLoop *loop, const netcore::NetAddr &addr, const std::string &name);
 	~HttpServer();
@@ -25,7 +25,7 @@ public:
 private:
 	void onMessage(const netcore::ConnectionPtr &conn, netcore::Buffer &buffer);
 	void onConnection(const netcore::ConnectionPtr &conn);
-	void defalutHttpCallback(const httpparser::HttpRequest &, httpparser::HttpResponse * response);
+	void defalutHttpCallback(const httpparser::HttpMessage *, httpparser::HttpResponse *);
 
 private:
 	netcore::EventLoop *loop_;

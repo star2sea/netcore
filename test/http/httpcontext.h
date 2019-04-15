@@ -5,18 +5,19 @@
 class HttpContext
 {
 public:
-	HttpContext();
+	HttpContext(httpparser::HttpMessage * msg);
+	~HttpContext() { delete message_; }
 
 	bool parse(netcore::Buffer* buf);
 
-	void reset() { request_.reset(); parseError_ = false; parseDone_ = false; }
+	void reset() { message_->reset(); parseError_ = false; parseDone_ = false; }
 
 	bool parseDone() const { return parseDone_; }
 
-	httpparser::HttpRequest request() const { return request_; }
+	httpparser::HttpMessage *message() const { return message_; }
 
 private:
-	httpparser::HttpRequest request_;
+	httpparser::HttpMessage *message_;
 	httpparser::HttpParser parser_;
 	bool parseError_;
 	bool parseDone_;
