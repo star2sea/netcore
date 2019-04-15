@@ -1,12 +1,23 @@
 #include "httpcontext.h"
 #include <algorithm>
+#include "../../utils/logger.h"
 using namespace netcore;
 
-HttpContext::HttpContext(httpparser::HttpMessage * msg)
-	: message_(msg),
-	parseError_(false),
-	parseDone_(false)
+void HttpContext::init(http_parser_type t)
 {
+	if (t == HTTP_REQUEST)
+	{
+		message_ = new httpparser::HttpRequest();
+	}
+	else if (t == HTTP_RESPONSE)
+	{
+		message_ = new httpparser::HttpResponse();
+	}
+	else 
+	{
+		LOG_ERROR << "HttpContext init error, http_parser_type = " << t;
+		return;
+	}
 	parser_.parser_init(message_, HTTP_REQUEST, [&](bool ret) {
 		if (ret)
 		{

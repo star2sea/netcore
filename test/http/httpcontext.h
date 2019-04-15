@@ -5,8 +5,11 @@
 class HttpContext
 {
 public:
-	HttpContext(httpparser::HttpMessage * msg);
+	HttpContext() : parseError_(false), parseDone_(false) {}
+
 	~HttpContext() { delete message_; }
+
+	void init(http_parser_type t);
 
 	bool parse(netcore::Buffer* buf);
 

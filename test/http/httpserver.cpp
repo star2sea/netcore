@@ -55,9 +55,8 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		assert(ctx_.find(fd) == ctx_.end());
-
-		httpparser::HttpMessage * msg = new httpparser::HttpRequest();
-		ctx_.emplace(std::make_pair(fd, msg));
+		ctx_.emplace(std::make_pair(fd, HttpContext()));
+		ctx_[fd].init(HTTP_REQUEST);
 	}
 	else
 	{
