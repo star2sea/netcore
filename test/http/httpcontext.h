@@ -5,9 +5,9 @@
 class HttpContext
 {
 public:
-	HttpContext() : parseError_(false), parseDone_(false) {}
+	HttpContext() : message_(nullptr), parseError_(false), parseDone_(false) {}
 
-	~HttpContext() { delete message_; }
+	~HttpContext() { if (message_) delete message_; }
 
 	void init(http_parser_type t);
 
