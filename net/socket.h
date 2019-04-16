@@ -32,7 +32,7 @@ typedef char * OPTVAL;
 #else
 #define SOCKET_FD(fd) fd
 #define SOCKET_HANDLE(fd) fd
-#define CLOSE_SOCKET(fd) close(fd)
+#define CLOSE_SOCKET(fd) ::close(fd)
 #define ERRNO errno
 typedef void * OPTVAL;
 #endif

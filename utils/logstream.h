@@ -69,7 +69,7 @@ namespace netcore
 		LogStream & operator<< (unsigned long long);
 		LogStream & operator<< (float);
 		LogStream & operator<< (double);
-		LogStream & operator<< (TimeStamp & ts);
+		LogStream & operator<< (const TimeStamp & ts);
 
 		Buffer & buffer() {return buffer_;}
 		void resetBuffer() {buffer_.reset();}

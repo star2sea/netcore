@@ -7,9 +7,9 @@
 #include "../utils/logger.h"
 #include "../utils/threadpool.h"
 #include <sstream>
-using namespace netcore;
 
 #ifndef _WIN32
+#include <signal.h>
 namespace 
 {
 	class IgnoreSigPipe
@@ -23,6 +23,8 @@ namespace
 	IgnoreSigPipe initObj;
 }
 #endif
+
+using namespace netcore;
 
 EventLoop::EventLoop()
 	:poller_(defaultPoller()),

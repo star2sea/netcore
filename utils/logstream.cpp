@@ -99,7 +99,7 @@ LogStream & LogStream::operator<< (double v){
 
 }
 
-LogStream & LogStream::operator<< (TimeStamp & ts) {
+LogStream & LogStream::operator<< (const TimeStamp & ts) {
 	return operator<<(ts.toFormatString());
 }
 

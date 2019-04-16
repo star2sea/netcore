@@ -108,7 +108,7 @@ def build_ninja():
 		print "ninja is ready, skipped"
 		return
 	create_new_dir(ninja_build_dir)
-	cmd_str = "cd %s && python %s\configure.py --bootstrap" % (ninja_build_dir, ninja_src_dir)
+	cmd_str = "cd %s && python %s/configure.py --bootstrap" % (ninja_build_dir, ninja_src_dir)
 	run_cmd(cmd_str)
 
 # build other libs

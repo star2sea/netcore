@@ -5,6 +5,7 @@
 #include <ctime>
 #include <iomanip>
 #include <string>
+#include <string.h>
 
 namespace netcore
 {
@@ -22,9 +23,9 @@ namespace netcore
 			auto low_mills = std::chrono::duration_cast<std::chrono::milliseconds>(low.tp_.time_since_epoch()).count();
 			return static_cast<double>(high_mills - low_mills) / 1000;
 		}
-		friend bool operator<(TimeStamp &lhs, TimeStamp & rhs) { return lhs.tp_ < rhs.tp_; }
-		friend bool operator==(TimeStamp & lhs, TimeStamp & rhs) { return lhs.tp_ == rhs.tp_; }
-		friend std::ostream & operator<<(std::ostream & os, TimeStamp & ts)
+		friend bool operator<(const TimeStamp &lhs, const TimeStamp & rhs) { return lhs.tp_ < rhs.tp_; }
+		friend bool operator==(const TimeStamp & lhs, const TimeStamp & rhs) { return lhs.tp_ == rhs.tp_; }
+		friend std::ostream & operator<<(std::ostream & os, const TimeStamp & ts)
 		{
 			auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(ts.tp_.time_since_epoch()).count() % 1000;
 			auto t = std::chrono::system_clock::to_time_t(ts.tp_);
