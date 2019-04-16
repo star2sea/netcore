@@ -1,5 +1,8 @@
 build/
 build.sh
+thirdparty/include
+thirdparty/src
+thirdparty/install
 # Prerequisites
 *.d
 
