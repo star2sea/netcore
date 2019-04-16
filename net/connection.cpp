@@ -59,6 +59,8 @@ void Connection::connectionDestroyed()
 void Connection::handleReadable()
 {
 	loop_->assertInOwnThread();
+#ifdef _WIN32
+
 	char buf[1024];
 	ssize_t n = sock_.read(buf, 1024);
 
@@ -76,7 +78,36 @@ void Connection::handleReadable()
 		input_.append(buf, n);
 		messageCallback_(shared_from_this(), input_);
 	}
-
+#else
+	char buf[65536];
+	struct iovec vec[2];
+	const size_t writable = input_.writeAvailable();
+	vec[0].iov_base = input_.writeBegin();
+	vec[0].iov_len = writable;
+	vec[1].iov_base = buf;
+	vec[1].iov_len = sizeof buf;
+	const int iovcnt = (writable < sizeof buf) ? 2 : 1;
+	ssize_t n = sock_.readv(vec, iovcnt);
+	if (n == 0)
+	{
+		handleClosed();
+	}
+	else if (n < 0)
+	{
+		handleClosed();
+	}
+	else if (size_t(n) <= writable)
+	{
+		input_.hasWritten(n);
+		messageCallback_(shared_from_this(), input_);
+	}
+	else
+	{
+		input_.hasWritten(writable);
+		input_.append(buf, n - writable);
+		messageCallback_(shared_from_this(), input_);
+	}
+#endif
 }
 
 void Connection::handleWritable()

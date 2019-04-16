@@ -24,6 +24,12 @@ void Buffer::consumeUntil(const char * until)
 	consume(t);
 }
 
+void Buffer::hasWritten(size_t n)
+{
+	assert(n <= writeAvailable());
+	writeIndex_ += n;
+}
+
 const char * Buffer::findCRLF() const
 {
 	const char * crlf = std::search(readBegin(), writeBegin(), CRLF, CRLF + 2);

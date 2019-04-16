@@ -81,6 +81,15 @@ ssize_t Socket::write(const char* buf, size_t len)
 #endif
 }
 
+ssize_t Socket::readv(struct iovec *vec, int iovcnt)
+{
+#ifndef _WIN32
+	return ::readv(SOCKET_HANDLE(sockfd_), vec, iovcnt);
+#else
+	return 0;
+#endif
+}
+
 void Socket::close()
 {
 	NetAddr addr(getPeerAddr());

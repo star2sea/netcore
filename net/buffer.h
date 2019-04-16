@@ -16,6 +16,7 @@ namespace netcore
 		std::string getAllAsString();
 		void consume(size_t n);
 		void consumeUntil(const char *);
+		void hasWritten(size_t n);
 		void append(const char *buf, size_t n);
 		void append(const std::string &str);
 

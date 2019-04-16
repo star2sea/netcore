@@ -8,6 +8,7 @@
 #include <ws2ipdef.h>
 #include <WS2tcpip.h> //inet_pton
 #else
+#include <sys/uio.h> //readv
 #include <sys/socket.h>
 #include <netinet/in.h>  // IPPROTO_TCP
 #include <netinet/tcp.h> // TCP_NODELAY
@@ -56,6 +57,7 @@ namespace netcore
 
 		ssize_t read(char *buf, size_t count);
 		ssize_t write(const char* buf, size_t len);
+		ssize_t readv(struct iovec *vec, int iovcnt);
 
 		void close();
 		void shutdown();
