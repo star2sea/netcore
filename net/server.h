@@ -23,6 +23,12 @@ namespace netcore
 		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
+		void onConnectionWrapper(const ConnectionPtr &conn) { loop_->runInLoop(std::bind(&Server::onConnectionInLoop, this, conn)); }
+		void onMessageWrapper(const ConnectionPtr &conn, Buffer &buffer) { loop_->runInLoop(std::bind(&Server::onMessageInLoop, this, conn, buffer)); }
+
+		void onConnectionInLoop(const ConnectionPtr &conn);
+		void onMessageInLoop(const ConnectionPtr &conn, Buffer &buffer);
+
 	private:
 		EventLoop *loop_;
 		NetAddr addr_;

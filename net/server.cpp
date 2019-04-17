@@ -26,14 +26,18 @@ void Server::start(int threadnum)
 	{
 		for (int i = 0; i < threadnum; ++i)
 		{
-			threads_.push_back(std::unique_ptr<EventLoopThread>(new EventLoopThread(addr_, connectionCallback_, messageCallback_)));
+			threads_.push_back(std::unique_ptr<EventLoopThread>(new EventLoopThread(
+				addr_, 
+				std::bind(&Server::onConnectionWrapper, this, std::placeholders::_1),
+				std::bind(&Server::onMessageWrapper, this, std::placeholders::_1, std::placeholders::_2)
+			)));
 		}
 	}
 	else
 	{
 		acceptor_ = std::make_shared<Acceptor>(loop_, addr_);
-		acceptor_->setMessageCallback(messageCallback_);
-		acceptor_->setConnectionCallback(connectionCallback_);
+		acceptor_->setMessageCallback(std::bind(&Server::onMessageWrapper, this, std::placeholders::_1, std::placeholders::_2));
+		acceptor_->setConnectionCallback(std::bind(&Server::onConnectionWrapper, this, std::placeholders::_1));
 		acceptor_->startAccept();
 	}
 }
@@ -51,4 +55,17 @@ void Server::stop()
 	{
 		loopthread->join();
 	}
+}
+
+void Server::onConnectionInLoop(const ConnectionPtr &conn)
+{
+	loop_->assertInOwnThread();
+	//printf("new connection in loop\n");
+	connectionCallback_(conn);
+}
+void Server::onMessageInLoop(const ConnectionPtr &conn, Buffer &buffer)
+{
+	loop_->assertInOwnThread();
+	//printf("new message in loop\n");
+	messageCallback_(conn, buffer);
 }

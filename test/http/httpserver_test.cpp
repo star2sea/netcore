@@ -19,8 +19,9 @@ int main()
 	EventLoop loop;
 	NetAddr serveraddr(22222);
 	HttpServer httpserver(&loop, serveraddr, "httptest");
-	httpserver.start(4);
+	httpserver.start(1);
 	loop.loop();
+	printf("main thread finish\n");
 	
 #ifdef _WIN32
 	WSACleanup();

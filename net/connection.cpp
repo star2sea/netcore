@@ -14,6 +14,7 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 	localaddr_(sock_.getLocalAddr())
 {
 	sock_.setTcpNoDelay(true);
+	sock_.setReuseAddr(true);
 	sock_.setKeepAlive(true);
 }
 
@@ -21,6 +22,7 @@ Connection::~Connection()
 {
 	loop_->assertInOwnThread();
 	sock_.close();
+	//printf("connection destory\n");
 }
 
 void Connection::connectionEstablished()
@@ -58,6 +60,7 @@ void Connection::connectionDestroyed()
 
 void Connection::handleReadable()
 {
+	//printf("connection handle readable fd = %d\n", fd());
 	loop_->assertInOwnThread();
 #ifdef _WIN32
 
@@ -135,6 +138,7 @@ void Connection::handleWritable()
 void Connection::handleClosed()
 {
 	loop_->assertInOwnThread();
+	//printf("handle closed fd %d\n", fd());
 	closedCallback_(shared_from_this());
 }
 

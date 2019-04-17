@@ -74,6 +74,7 @@ void Acceptor::handleReadable()
 	{
 		if (ERRNO == EMFILE)
 		{
+			printf("out of fd\n");
 			//todo
 		}
 	}

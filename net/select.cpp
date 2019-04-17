@@ -36,7 +36,7 @@ void SelectPoller::poll()
 	FD_ZERO(&wfds_);
 
 	struct timeval tv;
-	tv.tv_sec = 10;
+	tv.tv_sec = 1;
 	tv.tv_usec = 0;
 
 	for (auto iter = channels_.cbegin(); iter != channels_.cend(); ++iter)
@@ -46,6 +46,7 @@ void SelectPoller::poll()
 
 		if (channel->isReading())
 		{
+			printf("reading channel fd %d\n", channel->fd());
 			FD_SET(SOCKET_HANDLE(fd), &rfds_);
 			maxfd_ = maxfd_ > fd ? maxfd_ : fd;
 		}
@@ -57,10 +58,12 @@ void SelectPoller::poll()
 		}
 	}
 		
-	activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, NULL);
+	activeNum_ = select(maxfd_, &rfds_, &wfds_, NULL, &tv);
+
 
 	if (activeNum_ > 0)
 	{
+		printf("select return %d\n", activeNum_);
 		handleActiveChannels();
 	}
 	else if (activeNum_ == 0)
@@ -87,6 +90,7 @@ void SelectPoller::handleActiveChannels()
 		if (FD_ISSET(SOCKET_HANDLE(fd), &rfds_)) 
 		{
 			rset.insert(channel);
+			printf("readable fd %d\n", fd);
 		}
 
 		if (FD_ISSET(SOCKET_HANDLE(fd), &wfds_))

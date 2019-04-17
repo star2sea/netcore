@@ -55,13 +55,19 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		assert(ctx_.find(fd) == ctx_.end());
+		if (ctx_.find(fd) != ctx_.end())
+			printf("ctx_ already existed fd %d\n", fd);
+
 		ctx_.emplace(std::make_pair(fd, HttpContext()));
 		ctx_[fd].init(HTTP_REQUEST);
 	}
 	else
 	{
 		assert(ctx_.find(fd) != ctx_.end());
-		ctx_.erase(fd);
+		if (ctx_.find(fd) != ctx_.end())
+			ctx_.erase(fd);
+		else
+			printf("ctx_ not exsict fd %d\n", fd);
 	}
 }
 
