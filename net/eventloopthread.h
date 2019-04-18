@@ -24,7 +24,7 @@ namespace netcore
         void threadFunc(const NetAddr & addr);
     private:
         EventLoop * loop_;
-        std::shared_ptr<Acceptor> acceptor_;
+        std::unique_ptr<Acceptor> acceptor_;
         std::thread thread_;
 		std::mutex mtx_;
 		std::condition_variable cond_;

@@ -30,7 +30,6 @@ private:
 private:
 	netcore::EventLoop *loop_;
 	netcore::Server server_;
-	std::map<int, HttpContext> ctx_;
 	HttpCallback httpCallback_;
 };
 

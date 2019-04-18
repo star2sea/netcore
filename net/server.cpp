@@ -1,5 +1,7 @@
 #include <assert.h>
 #include "server.h"
+#include "connection.h"
+#include "../utils/logger.h"
 
 using namespace netcore;
 
@@ -7,8 +9,9 @@ Server::Server(EventLoop *loop, const NetAddr & addr, const std::string &name)
 	:loop_(loop),
 	addr_(addr),
 	name_(name),
-	acceptor_(NULL),
-	running_(false)
+	running_(false),
+	connectionCallback_(std::bind(&Server::defaultConnectionCallback, this, std::placeholders::_1)),
+	messageCallback_(std::bind(&Server::defaultMessageCallback, this, std::placeholders::_1, std::placeholders::_2))
 {
 
 }
@@ -22,23 +25,21 @@ void Server::start(int threadnum)
 {
 	running_ = true;
 
+	acceptor_ = std::unique_ptr<Acceptor>(new Acceptor(loop_, addr_));
+	acceptor_->setMessageCallback(messageCallback_);
+	acceptor_->setConnectionCallback(connectionCallback_);
+	acceptor_->startAccept();
+
 	if (threadnum > 0)
 	{
 		for (int i = 0; i < threadnum; ++i)
 		{
 			threads_.push_back(std::unique_ptr<EventLoopThread>(new EventLoopThread(
 				addr_, 
-				std::bind(&Server::onConnectionWrapper, this, std::placeholders::_1),
-				std::bind(&Server::onMessageWrapper, this, std::placeholders::_1, std::placeholders::_2)
+				connectionCallback_,
+				messageCallback_
 			)));
 		}
-	}
-	else
-	{
-		acceptor_ = std::make_shared<Acceptor>(loop_, addr_);
-		acceptor_->setMessageCallback(std::bind(&Server::onMessageWrapper, this, std::placeholders::_1, std::placeholders::_2));
-		acceptor_->setConnectionCallback(std::bind(&Server::onConnectionWrapper, this, std::placeholders::_1));
-		acceptor_->startAccept();
 	}
 }
 
@@ -57,15 +58,19 @@ void Server::stop()
 	}
 }
 
-void Server::onConnectionInLoop(const ConnectionPtr &conn)
+void Server::defaultConnectionCallback(const ConnectionPtr &conn)
 {
-	loop_->assertInOwnThread();
-	//printf("new connection in loop\n");
-	connectionCallback_(conn);
+	if (conn->isConnected())
+	{
+		LOG_TRACE << "new Connection";
+	}
+	else
+	{
+		LOG_TRACE << "Connection disconnected";
+	}
 }
-void Server::onMessageInLoop(const ConnectionPtr &conn, Buffer &buffer)
+
+void Server::defaultMessageCallback(const ConnectionPtr &conn, Buffer &buffer)
 {
-	loop_->assertInOwnThread();
-	//printf("new message in loop\n");
-	messageCallback_(conn, buffer);
+	buffer.consumeAll();
 }

@@ -21,7 +21,6 @@ int main()
 	HttpServer httpserver(&loop, serveraddr, "httptest");
 	httpserver.start(1);
 	loop.loop();
-	printf("main thread finish\n");
 	
 #ifdef _WIN32
 	WSACleanup();

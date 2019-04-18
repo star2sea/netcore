@@ -23,17 +23,17 @@ namespace netcore
 		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
 
-		void onConnectionWrapper(const ConnectionPtr &conn) { loop_->runInLoop(std::bind(&Server::onConnectionInLoop, this, conn)); }
-		void onMessageWrapper(const ConnectionPtr &conn, Buffer &buffer) { loop_->runInLoop(std::bind(&Server::onMessageInLoop, this, conn, buffer)); }
+		void onConnection(const ConnectionPtr &conn) { connectionCallback_(conn); }
+		void onMessage(const ConnectionPtr &conn, Buffer &buffer) { messageCallback_(conn, buffer); }
 
-		void onConnectionInLoop(const ConnectionPtr &conn);
-		void onMessageInLoop(const ConnectionPtr &conn, Buffer &buffer);
+		void defaultConnectionCallback(const ConnectionPtr &conn);
+		void defaultMessageCallback(const ConnectionPtr &conn, Buffer &buffer);
 
 	private:
 		EventLoop *loop_;
 		NetAddr addr_;
 		std::string name_;
-		std::shared_ptr<Acceptor> acceptor_;
+		std::unique_ptr<Acceptor> acceptor_;
 		bool running_;
 		std::vector<std::unique_ptr<EventLoopThread>> threads_;
 

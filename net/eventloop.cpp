@@ -32,7 +32,6 @@ EventLoop::EventLoop()
 	running_(false)
 {
 	createWakeupFd();
-	printf("wakeup fd %d\n", wakeupSock_[1].fd());
 	wakeupChannel_ = std::unique_ptr<Channel>(new Channel(wakeupSock_[1].fd(), this));
 	wakeupChannel_->setReadableCallback(std::bind(&EventLoop::onWakeup, this));
 	wakeupChannel_->enableReading();
@@ -105,7 +104,6 @@ void EventLoop::runInLoop(const Func &cb)
 
 void EventLoop::onWakeup()
 {
-	printf("ffff onwakeup\n");
 	char one[1];
 	ssize_t n = wakeupSock_[1].read(one, sizeof one);
 	if (n != sizeof one)
@@ -114,14 +112,13 @@ void EventLoop::onWakeup()
 	}
 	else
 	{
-		LOG_INFO << "EventLoop onWakeup";
+		LOG_TRACE << "EventLoop onWakeup";
 	}
 }
 
 void EventLoop::wakeup()
 {
 	char one = ' ';
-	printf("dddd wakeup\n");
 	ssize_t n = wakeupSock_[0].write(&one, sizeof one);
 	if (n != sizeof one)
 	{

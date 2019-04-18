@@ -110,6 +110,6 @@ void Connector::disconnect()
 	if (state_ == Disconnected)
 		return;
 	state_ = Disconnected;
-	connection_->connectionDestroyed();
+	connection_->forceClose();
 	sock_.close();
 }

@@ -2,7 +2,7 @@
 
 using namespace netcore;
 
-Logger::LogLevel Logger::logLevel_ = Logger::TRACE;
+Logger::LogLevel Logger::logLevel_ = Logger::INFO;
 
 Logger::Logger(const char* file, int line, const char * level, const char* func)
     : stream_(),

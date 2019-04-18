@@ -8,6 +8,7 @@
 #include "socket.h"
 #include "buffer.h"
 #include "netaddr.h"
+#include "../test/http/httpcontext.h"
 namespace netcore
 {
 	class Connection :NonCopyable, public std::enable_shared_from_this<Connection>
@@ -28,7 +29,6 @@ namespace netcore
 		bool isConnected() const { return state_ == Connected; }
 
 		void connectionEstablished();
-		void connectionDestroyed();
 
 		void setConnectionCallback(const ConnectionCallback & cb) { connectionCallback_ = cb; }
 		void setMessageCallback(const MessageCallback & cb) { messageCallback_ = cb; }
@@ -36,20 +36,25 @@ namespace netcore
 
 		void handleReadable();
 		void handleWritable();
+		void handleClosed();
 
 		void send(const char* buf, size_t count);
 		void send(Buffer &buffer);
 		void send(const std::string &str);
 
 		void shutdown();
+		void forceClose();
 
 		const NetAddr & getPeerAddr() const { return peeraddr_; }
 		const NetAddr & getLocalAddr() const { return localaddr_; }
 
+	public:
+		HttpContext * ctx_;
+
 	private:
-		void sendInLoop(const char* buf, size_t count);
+		void sendInLoop(const std::string & str);
 		void shutdownInLoop();
-		void handleClosed();
+		void forceCloseInLoop();
 
 	private:
 		EventLoop * loop_;

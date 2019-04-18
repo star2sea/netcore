@@ -35,7 +35,7 @@ void EventLoopThread::threadFunc(const NetAddr & addr)
 	{
 		std::unique_lock<std::mutex> lock(mtx_);
 		
-		acceptor_ = std::make_shared<Acceptor>(&loop, addr);
+		acceptor_ = std::unique_ptr<Acceptor>(new Acceptor(&loop, addr));
 		acceptor_->setConnectionCallback(connectionCallback_);
 		acceptor_->setMessageCallback(messageCallback_);
 		acceptor_->startAccept();
