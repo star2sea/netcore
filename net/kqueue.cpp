@@ -7,8 +7,9 @@
 
 using namespace netcore;
 
-KqueuePoller::KqueuePoller()
-	: kqueuefd_(kqueue()),
+KqueuePoller::KqueuePoller(EventLoop *loop)
+	:Poller(loop), 
+	kqueuefd_(kqueue()),
 	eventlist_(2 * kInitEvtSize)
 {
 	if (kqueuefd_ < 0) {
@@ -79,7 +80,7 @@ void KqueuePoller::updateChannel(Channel *channel)
 void KqueuePoller::removeChannel(Channel *channel)
 {
 	loop_->assertInOwnThread();
-
+	struct kevent kevt[2];
 	int fd = channel->fd();
 	assert(channels_.find(fd) != channels_.end());
 	if (channels_.find(fd) != channels_.end())
@@ -111,7 +112,7 @@ void KqueuePoller::handleActiveChannels()
 
 void KqueuePoller::poll()
 {
-	activeNum_ = kevent(kqueuefd_, NULL, 0, &*eventlist_.begin(), eventlist_.size(), -1);
+	activeNum_ = kevent(kqueuefd_, NULL, 0, &*eventlist_.begin(), eventlist_.size(), NULL);
 
 	int savedErrno = errno;
 	if (activeNum_ > 0) 
