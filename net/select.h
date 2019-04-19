@@ -7,7 +7,6 @@
 #include <sys/select.h>
 #endif
 
-#include "../utils/noncopyable.h"
 #include "poller.h"
 
 namespace netcore

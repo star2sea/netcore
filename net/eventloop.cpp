@@ -1,12 +1,17 @@
 #include "eventloop.h"
 #include "channel.h"
-#include "select.h"
-#include "epoll.h"
-#include "kqueue.h"
 #include <stdlib.h>
 #include "../utils/logger.h"
 #include "../utils/threadpool.h"
 #include <sstream>
+
+#ifdef USE_EPOLL
+#include "epoll.h"
+#elif USE_KQUEUE
+#include "kqueue.h"
+#else
+#include "select.h"
+#endif
 
 #ifndef _WIN32
 #include <signal.h>
@@ -92,8 +97,6 @@ void EventLoop::runInLoop(const Func &cb)
 	if (inOwnThread())
 	{
 		cb();
-		/*pendingFuncs_.put(cb);
-		wakeup();*/
 	}
 	else
 	{

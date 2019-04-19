@@ -19,11 +19,9 @@ void SelectPoller::removeChannel(Channel *channel)
 	loop_->assertInOwnThread();
 	
 	int fd = channel->fd();
+	assert(channels_.find(fd) != channels_.end());
 	if (channels_.find(fd) != channels_.end())
 		channels_.erase(fd);
-
-	if (changes_.find(channel) != changes_.end())
-		changes_.erase(channel);
 }
 
 void SelectPoller::poll()
@@ -70,8 +68,8 @@ void SelectPoller::poll()
 	}
 	else
 	{
-		/*if (ERRNO != EINTR)
-			LOG_ERROR << "Select error, errno = " << ERRNO; */
+		if (ERRNO != EINTR)
+			LOG_ERROR << "Select error, errno = " << ERRNO; 
 	}
 }
 
