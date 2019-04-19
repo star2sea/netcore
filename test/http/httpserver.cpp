@@ -42,7 +42,6 @@ void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 
 void HttpServer::onConnection(const ConnectionPtr &conn)
 {
-	int fd = conn->fd();
 	if (conn->isConnected())
 	{
 		conn->ctx_ = new HttpContext();
