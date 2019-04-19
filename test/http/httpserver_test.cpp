@@ -19,7 +19,7 @@ int main()
 	EventLoop loop;
 	NetAddr serveraddr(22222);
 	HttpServer httpserver(&loop, serveraddr, "httptest");
-	httpserver.start(15);
+	httpserver.start(7);
 	loop.loop();
 	
 #ifdef _WIN32

@@ -142,7 +142,10 @@ void Connection::shutdown()
 {
 	if (state_ == Connected)
 	{
-		loop_->runInLoop(std::bind(&Connection::shutdownInLoop, shared_from_this()));
+		if (loop_->inOwnThread())
+			shutdownInLoop();
+		else
+			loop_->runInLoop(std::bind(&Connection::shutdownInLoop, shared_from_this()));
 	}
 }
 
