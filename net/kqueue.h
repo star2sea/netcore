@@ -11,7 +11,7 @@ namespace netcore
 	class KqueuePoller :public Poller
 	{
 	public:
-		KqueuePoller();
+		KqueuePoller(EventLoop *loop);
 		~KqueuePoller() override;
 		void updateChannel(Channel *) override;
 		void removeChannel(Channel *) override;

@@ -7,7 +7,7 @@ namespace netcore
 	class Buffer
 	{
 	public:
-		Buffer(size_t t=kInitBufSize) : vec_(t), readIndex_(0), writeIndex_(0) {}
+		Buffer(size_t t=kInitBufSize) : readIndex_(0), writeIndex_(0), vec_(t) {}
 		
 		char * writeBegin() { return begin() + writeIndex_; }
 		const char *writeBegin() const { return begin() + writeIndex_; }
