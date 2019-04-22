@@ -19,7 +19,7 @@ HttpServer::~HttpServer()
 }
 
 void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
-{
+{	
 	HttpContext * http_ctx = conn->ctx_;
 	bool ret = http_ctx->parse(&buffer);
 	if (!ret)
@@ -31,9 +31,7 @@ void HttpServer::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 	{
 		httpparser::HttpResponse response;
 		httpCallback_(http_ctx->message(), &response);
-		Buffer buf(65536);
-		buf.append(response.toStr());
-		conn->send(buf);
+		conn->send(response.toStr());
 		if (!response.getKeepAlive())
 			conn->shutdown();
 		http_ctx->reset();

@@ -7,7 +7,7 @@ namespace netcore
 	class Buffer
 	{
 	public:
-		Buffer(size_t t) : vec_(t), readIndex_(0), writeIndex_(0) {}
+		Buffer(size_t t=kInitBufSize) : vec_(t), readIndex_(0), writeIndex_(0) {}
 		
 		char * writeBegin() { return begin() + writeIndex_; }
 		const char *writeBegin() const { return begin() + writeIndex_; }
@@ -36,6 +36,7 @@ namespace netcore
 		size_t writeIndex_;
 		std::vector<char> vec_;
 		static const char CRLF[];
+		static const int kInitBufSize = 1024;
 	};
 }
 

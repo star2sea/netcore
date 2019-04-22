@@ -92,7 +92,6 @@ ssize_t Socket::readv(struct iovec *vec, int iovcnt)
 
 void Socket::close()
 {
-	NetAddr addr(getPeerAddr());
 	CLOSE_SOCKET(sockfd_);
 }
 

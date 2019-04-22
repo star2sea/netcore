@@ -41,7 +41,7 @@ namespace netcore
 
 	private:
 		const char * end() const {return buf_ + sizeof(buf_);}
-		void bzero() {memset(buf_, 0, sizeof buf_);}
+		void bzero() { memset(buf_, 0, sizeof buf_); }
 
 		char buf_[SIZE] = {0};
 		char * cur_;

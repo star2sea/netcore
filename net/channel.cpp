@@ -1,4 +1,5 @@
 #include "channel.h"
+#include "../utils/logger.h"
 using namespace netcore;
 
 void Channel::reallocate(int fd)
@@ -20,6 +21,10 @@ void Channel::handleReadable()
 		{
 			handleReadableWithGuard();
 		}
+		else 
+		{
+			LOG_ERROR << "Channel handleReadable error, Connection is Destroyed";
+		}
 	}
 	else
 	{
@@ -36,6 +41,10 @@ void Channel::handleWritable()
 		if (guard)
 		{
 			handleWritableWithGuard();
+		}
+		else
+		{
+			LOG_ERROR << "Channel handleWritable error, Connection is Destroyed";
 		}
 	}
 	else
