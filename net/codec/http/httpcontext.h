@@ -1,6 +1,6 @@
 #ifndef __HTTP_CONTEXT_H
 #define __HTTP_CONTEXT_H
-#include "../../net/buffer.h"
+#include "../../buffer.h"
 #include "http_parser/httpparser.h"
 class HttpContext
 {

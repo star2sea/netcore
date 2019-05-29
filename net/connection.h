@@ -8,7 +8,7 @@
 #include "socket.h"
 #include "buffer.h"
 #include "netaddr.h"
-#include "../test/http/httpcontext.h"
+#include  "codec/codec.h"
 namespace netcore
 {
 	class Connection :NonCopyable, public std::enable_shared_from_this<Connection>
@@ -48,8 +48,7 @@ namespace netcore
 		const NetAddr & getPeerAddr() const { return peeraddr_; }
 		const NetAddr & getLocalAddr() const { return localaddr_; }
 
-	public:
-		HttpContext * ctx_;
+		void setConnectionCodec(Codec * codec) { codec_ = codec; }
 
 	private:
 		void sendInLoop(const std::string & str);
@@ -66,6 +65,7 @@ namespace netcore
 		NetAddr peeraddr_;
 		NetAddr localaddr_;
 
+		Codec *codec_;
 
 		MessageCallback messageCallback_;
 		ConnectionCallback connectionCallback_;

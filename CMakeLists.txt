@@ -29,6 +29,9 @@ macro(add_vg_source_dir name)
 endmacro()
 
 add_vg_source_dir(net)
+add_vg_source_dir(net/codec)
+add_vg_source_dir(net/codec/http)
+add_vg_source_dir(net/codec/protobuf)
 add_vg_source_dir(utils)
 
 file(GLOB EPOLL_SRC net/epoll.*)

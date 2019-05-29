@@ -12,7 +12,8 @@ Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
 	input_(65536),
 	output_(65536),
 	peeraddr_(peeraddr),
-	localaddr_(sock_.getLocalAddr())
+	localaddr_(sock_.getLocalAddr()),
+	codec_(nullptr)
 {
 	sock_.setTcpNoDelay(true);
 	sock_.setReuseAddr(true);
@@ -23,6 +24,10 @@ Connection::~Connection()
 {
 	LOG_TRACE << "Connection::~Connection fd = " << fd();
 	sock_.close();
+	if (codec_)
+	{
+		delete codec_;
+	}
 }
 
 void Connection::connectionEstablished()
