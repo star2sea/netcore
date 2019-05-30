@@ -48,7 +48,15 @@ namespace netcore
 		const NetAddr & getPeerAddr() const { return peeraddr_; }
 		const NetAddr & getLocalAddr() const { return localaddr_; }
 
-		void setConnectionCodec(Codec * codec) { codec_ = codec; }
+		template <class CodecT>
+		void setConnectionCodec(Codec * codec) 
+		{ 
+			codec_ = codec; 
+			CodecT *realcodec = static_cast<CodecT *>(codec);
+			setMessageCallback(std::bind(&CodecT::onMessage, realcodec, std::placeholders::_1, std::placeholders::_2));
+		}
+
+		Codec * getConnectionCodec() { return codec_; }
 
 	private:
 		void sendInLoop(const std::string & str);

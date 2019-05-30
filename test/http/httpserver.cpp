@@ -24,10 +24,9 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 	if (conn->isConnected())
 	{
 		HttpCodec *codec = new HttpCodec(HTTP_REQUEST);
-		codec->setHttpCallback(std::bind(&HttpServer::onMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-		
-		conn->setConnectionCodec(static_cast<Codec*>(codec));
-		conn->setMessageCallback(std::bind(&HttpCodec::onMessage, codec, std::placeholders::_1, std::placeholders::_2));
+		codec->setMessageCallback(std::bind(&HttpServer::onMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+		conn->setConnectionCodec<HttpCodec>(static_cast<Codec*>(codec));
+		/*conn->setMessageCallback(std::bind(&HttpCodec::onMessage, codec, std::placeholders::_1, std::placeholders::_2));*/
 	}
 }
 

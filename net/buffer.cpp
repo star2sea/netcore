@@ -60,6 +60,13 @@ void Buffer::append(const std::string &str)
 	append(&*str.begin(), str.size());
 }
 
+void Buffer::prepend(const char *buf, size_t n)
+{
+	assert(n <= prependAvailable());
+	readIndex_ -= n;
+	std::copy(buf, buf + n, begin() + readIndex_);
+}
+
 void Buffer::ensureEnoughSpace(size_t n)
 {
 	if (writeAvailable() < n)
@@ -76,4 +83,14 @@ void Buffer::ensureEnoughSpace(size_t n)
 			vec_.resize(writeIndex_ + n);
 		}
 	}
+}
+
+void Buffer::debugShowAllBytes()
+{
+	printf("buffer: ");
+	for (int i = readIndex_; i < writeIndex_; ++i)
+	{
+		printf("%d ", vec_[i]);
+	}
+	printf("\n");
 }

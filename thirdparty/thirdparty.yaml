@@ -11,4 +11,12 @@ thirdparty:
         tag: v1.9.0
     
     http_parser:
-       git: https://github.com/star2sea/http-parser.git
+        git: https://github.com/star2sea/http-parser.git
+
+    zlib:
+        git: https://github.com/star2sea/zlib.git
+
+    protobuf:
+        git: https://github.com/star2sea/protobuf.git
+        cmakelist_dir: cmake
+        cmake_args: [-Dprotobuf_MSVC_STATIC_RUNTIME=OFF]

@@ -3,7 +3,7 @@ import os
 import shutil
 import yaml
 import platform
-# import subprocess
+import subprocess
 
 def existed(path):
 	return os.path.exists(path)
@@ -22,28 +22,29 @@ def create_new_dir(dir_name):
 
 def run_cmd(cmd_str):
 	print "--run cmd--", cmd_str
-	rs = os.popen(cmd_str, "r")
-	cmdout = rs.read()
-	print cmdout
-	# poll_code = None
-	# p = None
-	# try:
-	# 	p = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
-	# 	while True:
-	# 		output = p.stdout.readline()
-	# 		if output:
-	# 			print output,
-	# 		poll_code = p.poll()
-	# 		if poll_code is not None:
-	# 			break
-	# except Exception, e:
-	# 	p.terminate()
-	# 	print e
-	# finally:
-	# 	p.stdout.flush()
-	# 	output = p.stdout.read()
-	# 	if output:
-	# 		print output
+	# rs = os.popen(cmd_str, "r")
+	# cmdout = rs.read()
+	# print cmdout
+
+	poll_code = None
+	p = None
+	try:
+		p = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
+		while True:
+			output = p.stdout.readline()
+			if output:
+				print output,
+			poll_code = p.poll()
+			if poll_code is not None:
+				break
+	except Exception, e:
+		p.terminate()
+		print e
+	finally:
+		p.stdout.flush()
+		output = p.stdout.read()
+		if output:
+			print output
 	# assert poll_code == 0, 'run cmd failed, code %s!' % poll_code
 
 
@@ -94,6 +95,8 @@ def download_libs():
 				if attr.get('tag'):
 					cmd_str = "cd %s && git checkout %s"%(source_path, attr.get('tag'))
 					run_cmd(cmd_str)
+				cmd_str = "cd %s && git submodule update --init --recursive"%src_dir
+				run_cmd(cmd_str)
 
 # build ninja
 ninja = None
@@ -116,9 +119,9 @@ def build_libs():
 	for name, attr in conf["thirdparty"].iteritems():
 		if name == "ninja":
 			continue
-		build_one_lib(name, attr.get('cmake_args'))
+		build_one_lib(name, attr)
 
-def build_one_lib(lib_name, cmake_args=None):
+def build_one_lib(lib_name, attr):
 	lib_src_dir = os.path.join(src_dir, lib_name)
 	lib_build_dir = os.path.join(build_dir, lib_name)
 
@@ -129,11 +132,17 @@ def build_one_lib(lib_name, cmake_args=None):
 	print "-- build %s begin --"%lib_name
 	final_cmake_args = []
 	final_cmake_args.extend(conf.get("cmake_args", []))
+
+	cmake_args = attr.get('cmake_args', None)
 	if cmake_args:
 		final_cmake_args.extend(cmake_args)
 	final_cmake_args.append("-DCMAKE_INSTALL_PREFIX=%s" % install_dir)
 	final_cmake_args.append("-DCMAKE_MAKE_PROGRAM=%s" % ninja)
 	cmake_arg_str = " ".join(final_cmake_args)
+
+	cmakelist_dir = attr.get('cmakelist_dir')
+	if cmakelist_dir:
+		lib_src_dir = os.path.join(lib_src_dir, cmakelist_dir)
 	cmd_str = " ".join(["cmake -G Ninja", cmake_arg_str, lib_src_dir])
 	run_cmd(cmd_str)
 	run_cmd(ninja)

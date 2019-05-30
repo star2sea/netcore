@@ -2,7 +2,6 @@
 #define __CODEC_H
 #include "../callback.h"
 #include "../buffer.h"
-
 namespace netcore
 {
 	class Codec

@@ -1,0 +1,6 @@
+package netcore;
+
+message Test {
+  required int64 id = 1;
+  required string tester = 2;
+}

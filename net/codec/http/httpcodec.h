@@ -13,7 +13,7 @@ namespace netcore
 		HttpCodec(http_parser_type t);
 		virtual ~HttpCodec() {}
 		virtual void onMessage(const ConnectionPtr &conn, Buffer &buffer) override;
-		void setHttpCallback(const HttpCallback &cb) { httpCallback_ = cb; }
+		void setMessageCallback(const HttpCallback &cb) { httpCallback_ = cb; }
 	private:
 		void defalutHttpCallback(const ConnectionPtr &, const httpparser::HttpMessage *, httpparser::HttpResponse *);
 	private:
