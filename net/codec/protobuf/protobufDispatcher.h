@@ -1,6 +1,6 @@
 #ifndef __PROTOBUF_DISPATCH_H
 #define __PROTOBUF_DISPATCH_H
-#include "protobufCodec.h"
+#include "protobufcodec.h"
 #include "../../connection.h"
 namespace netcore
 {
@@ -19,9 +19,9 @@ namespace netcore
 
 		CallbackT(const ProtobufMessageCallback & cb): callback_(cb) {}
 
-		virtual void onMessage(const ConnectionPtr &conn, const ProtoMsgPtr &msgPtr)
+		virtual void onMessage(const ConnectionPtr &conn, const ProtoMsgPtr &msg)
 		{
-			std::shared_ptr<T> realmsg = std::dynamic_pointer_cast<T>(msgPtr);
+			std::shared_ptr<T> realmsg = std::dynamic_pointer_cast<T>(msg);
 			callback_(conn, realmsg);
 		}
 	private:
@@ -51,16 +51,16 @@ namespace netcore
 			callbacks_[T::descriptor()] = cbT;
 		}
 
-		void onMessage(const ConnectionPtr &conn, const ProtoMsgPtr &msgPtr)
+		void onMessage(const ConnectionPtr &conn, const ProtoMsgPtr &msg)
 		{
-			auto iter = callbacks_.find(msgPtr->GetDescriptor());
+			auto iter = callbacks_.find(msg->GetDescriptor());
 			if (iter != callbacks_.end())
 			{
-				iter->second->onMessage(conn, msgPtr);
+				iter->second->onMessage(conn, msg);
 			}
 			else
 			{
-				defaultCallback_(conn, msgPtr);
+				defaultCallback_(conn, msg);
 			}
 		}
 

@@ -5,7 +5,8 @@
 #include "../../net/connection.h"
 #include "../../utils/logger.h"
 #include "../../net/codec/protobuf/protobufcodec.h"
-#include "test.pb.h"
+#include "../../net/codec/protorpc/protorpcchannel.h"
+#include "rpcservice.pb.h"
 #include <functional>
 
 #ifdef _WIN32

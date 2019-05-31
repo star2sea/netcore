@@ -5,8 +5,8 @@
 #include "../../net/connection.h"
 #include "../../utils/logger.h"
 #include "../../net/codec/protobuf/protobufcodec.h"
-#include "../../net/codec/protobuf/protobufdispatcher.h"
-#include "test.pb.h"
+#include "../../net/codec/protobuf/protorpcchannel.h"
+#include "rpcservice.pb.h"
 #include <functional>
 
 #ifdef _WIN32
@@ -18,31 +18,15 @@ class ServerTest
 {
 public:
 	ServerTest(EventLoop *loop, const NetAddr &addr)
-		:server_(loop, addr, std::string("servertest")),
-		dispatcher_(std::bind(&ServerTest::onDefaultMessage, this, std::placeholders::_1, std::placeholders::_2))
+		:server_(loop, addr, std::string("servertest"))
 	{
 		server_.setConnectionCallback(std::bind(&ServerTest::onConnection, this, std::placeholders::_1));
-		dispatcher_.registerMessageCallback<Test>(std::bind(&ServerTest::onTestMessage, this, std::placeholders::_1, std::placeholders::_2));
 	}
 	~ServerTest() { server_.stop(); }
 	void start(int threadnum = 0) { server_.start(threadnum); }
 	void stop() { server_.stop(); }
 
-	void onDefaultMessage(const ConnectionPtr &conn, const ProtoMsgPtr & msg)
-	{
-		LOG_INFO << "unknow msg: " << msg->GetTypeName();
-		Codec *codec = conn->getConnectionCodec();
-		ProtobufCodec * protoCodec = static_cast<ProtobufCodec *>(codec);
-
-		Buffer buf;
-		protoCodec->fillEmptyBuffer(&buf, msg);
-		conn->send(buf);
-	}
-
-	void onTestMessage(const ConnectionPtr &conn, const std::shared_ptr<Test> &msg)
-	{
-		LOG_INFO << "test msg from " << msg->tester();
-	}
+	
 
 	void onConnection(const ConnectionPtr &conn)
 	{
@@ -51,9 +35,8 @@ public:
 			LOG_INFO << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() << 
 				" localaddr " << conn->getLocalAddr().toIpPort();
 
-			ProtobufCodec *codec = new ProtobufCodec();
-			codec->setMessageCallback(std::bind(&ProtobufDispatcher::onMessage, &dispatcher_, std::placeholders::_1, std::placeholders::_2));
-			conn->setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
+			std::shared_ptr<ProtoRpcChannel> ptr = conn->attachNewProtoRpcChannel();
+			ptr->registerRpcService(); // TODO
 		}
 		else
 		{
@@ -63,7 +46,6 @@ public:
 	}
 private:
 	Server server_;
-	ProtobufDispatcher dispatcher_;
 };
 
 int main()

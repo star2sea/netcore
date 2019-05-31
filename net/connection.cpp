@@ -2,6 +2,7 @@
 #include "channel.h"
 #include "../utils/timestamp.h"
 #include "../utils/logger.h"
+#include "codec/protorpc/protorpcchannel.h"
 using namespace netcore;
 
 Connection::Connection(EventLoop *loop, int connfd, NetAddr& peeraddr)
@@ -261,4 +262,13 @@ void Connection::sendInLoop(const std::string & str)
 			connChannel_.enableWriting();
 		}
 	}
+}
+
+Connection::ProtoRpcChannelPtr Connection::attachNewProtoRpcChannel()
+{
+	ProtobufCodec *codec = new ProtobufCodec();
+	protoRpcChannel_.reset(new ProtoRpcChannel(shared_from_this()));
+	codec->setMessageCallback(std::bind(&ProtoRpcChannel::onRpcMessage, protoRpcChannel_, std::placeholders::_1, std::placeholders::_2));
+	setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
+	return protoRpcChannel_;
 }

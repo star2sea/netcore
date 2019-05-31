@@ -1,0 +1,16 @@
+package netcore;
+
+enum ErrorCode
+{
+	NO_ERROR = 0;
+	WRONG_PROTO = 1;
+	NO_SERVICE = 2;
+	NO_METHOD = 3;
+}
+
+message RpcMessage
+{
+	required string service = 1;
+	required string method = 2;
+	optional bytes message = 3;
+}

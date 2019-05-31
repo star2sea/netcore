@@ -11,6 +11,8 @@
 #include  "codec/codec.h"
 namespace netcore
 {
+	class ProtoRpcChannel;
+
 	class Connection :NonCopyable, public std::enable_shared_from_this<Connection>
 	{
 	public:
@@ -21,6 +23,7 @@ namespace netcore
 			Disconnecting,
 			Disconnected
 		};
+		typedef std::shared_ptr<ProtoRpcChannel> ProtoRpcChannelPtr;
 
 		Connection(EventLoop *loop, int connfd, NetAddr &peeraddr);
 		~Connection();
@@ -48,6 +51,8 @@ namespace netcore
 		const NetAddr & getPeerAddr() const { return peeraddr_; }
 		const NetAddr & getLocalAddr() const { return localaddr_; }
 
+		ProtoRpcChannelPtr attachNewProtoRpcChannel();
+
 		template <class CodecT>
 		void setConnectionCodec(Codec * codec) 
 		{ 
@@ -74,6 +79,7 @@ namespace netcore
 		NetAddr localaddr_;
 
 		Codec *codec_;
+		ProtoRpcChannelPtr protoRpcChannel_;
 
 		MessageCallback messageCallback_;
 		ConnectionCallback connectionCallback_;
