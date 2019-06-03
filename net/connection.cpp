@@ -256,7 +256,7 @@ void Connection::sendInLoop(const std::string & str)
 			LOG_ERROR << "Connection::SendInloop write error, fd = " << fd() << " errno = " << ERRNO;
 			handleClosed();
 		}
-		else if (n < count)
+		else if (n < static_cast<size_t>(count))
 		{
 			output_.append(buf + n, count - n);
 			connChannel_.enableWriting();
@@ -271,4 +271,12 @@ Connection::ProtoRpcChannelPtr Connection::attachNewProtoRpcChannel()
 	codec->setMessageCallback(std::bind(&ProtoRpcChannel::onRpcMessage, protoRpcChannel_, std::placeholders::_1, std::placeholders::_2));
 	setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
 	return protoRpcChannel_;
+}
+
+void Connection::attachProtoRpcChannel(const ProtoRpcChannelPtr & ptr)
+{
+	ProtobufCodec *codec = new ProtobufCodec();
+	protoRpcChannel_ = ptr;
+	codec->setMessageCallback(std::bind(&ProtoRpcChannel::onRpcMessage, protoRpcChannel_, std::placeholders::_1, std::placeholders::_2));
+	setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
 }

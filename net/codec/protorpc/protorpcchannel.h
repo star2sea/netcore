@@ -12,8 +12,11 @@ namespace netcore
 	{
 	public:
 		typedef std::shared_ptr<RpcMessage> RpcMsgPtr;
+		ProtoRpcChannel() = default;
 		explicit ProtoRpcChannel(const ConnectionPtr & conn) : conn_(conn) {}
 		~ProtoRpcChannel() override {};
+
+		void connectionAttached(const ConnectionPtr & conn) { conn_ = conn; }
 
 		void registerRpcService(google::protobuf::Service * service) 
 		{

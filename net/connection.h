@@ -53,6 +53,8 @@ namespace netcore
 
 		ProtoRpcChannelPtr attachNewProtoRpcChannel();
 
+		void attachProtoRpcChannel(const ProtoRpcChannelPtr &);
+
 		template <class CodecT>
 		void setConnectionCodec(Codec * codec) 
 		{ 

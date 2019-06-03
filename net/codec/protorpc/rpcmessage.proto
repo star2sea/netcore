@@ -2,10 +2,11 @@ package netcore;
 
 enum ErrorCode
 {
-	NO_ERROR = 0;
+	NO_ERR = 0;
 	WRONG_PROTO = 1;
 	NO_SERVICE = 2;
 	NO_METHOD = 3;
+	INVALID_REQUEST = 4;
 }
 
 message RpcMessage

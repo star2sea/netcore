@@ -1,6 +1,15 @@
 package netcore;
+option cc_generic_services = true;
+option java_generic_services = true;
+option py_generic_services = true;
 
-message Test {
-  required int64 id = 1;
-  required string tester = 2;
+message TestRequest{
+	required string testmsg = 1;
+}
+
+message TestResponse{
+}
+
+service TestService{
+	rpc TestRpc(TestRequest) returns (TestResponse);
 }

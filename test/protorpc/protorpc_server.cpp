@@ -5,7 +5,7 @@
 #include "../../net/connection.h"
 #include "../../utils/logger.h"
 #include "../../net/codec/protobuf/protobufcodec.h"
-#include "../../net/codec/protobuf/protorpcchannel.h"
+#include "../../net/codec/protorpc/protorpcchannel.h"
 #include "rpcservice.pb.h"
 #include <functional>
 
@@ -13,6 +13,19 @@
 #pragma comment(lib,"ws2_32.lib")
 #endif
 using namespace netcore;
+
+class RpcTestService : public TestService
+{
+public:
+	virtual void TestRpc(::google::protobuf::RpcController* controller,
+		const TestRequest* request,
+		TestResponse* response,
+		::google::protobuf::Closure* done)
+	{
+		LOG_INFO << "RpcTestService::TestRpc with msg ==== " << (request->testmsg());
+	}
+};
+
 
 class ServerTest
 {
@@ -36,7 +49,7 @@ public:
 				" localaddr " << conn->getLocalAddr().toIpPort();
 
 			std::shared_ptr<ProtoRpcChannel> ptr = conn->attachNewProtoRpcChannel();
-			ptr->registerRpcService(); // TODO
+			ptr->registerRpcService(&rpcTestService_);
 		}
 		else
 		{
@@ -46,6 +59,8 @@ public:
 	}
 private:
 	Server server_;
+	RpcTestService rpcTestService_;
+
 };
 
 int main()

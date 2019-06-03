@@ -66,14 +66,15 @@ PROTOBUF_NAMESPACE_CLOSE
 namespace netcore {
 
 enum ErrorCode : int {
-  NO_ERROR = 0,
+  NO_ERR = 0,
   WRONG_PROTO = 1,
   NO_SERVICE = 2,
-  NO_METHOD = 3
+  NO_METHOD = 3,
+  INVALID_REQUEST = 4
 };
 bool ErrorCode_IsValid(int value);
-constexpr ErrorCode ErrorCode_MIN = NO_ERROR;
-constexpr ErrorCode ErrorCode_MAX = NO_METHOD;
+constexpr ErrorCode ErrorCode_MIN = NO_ERR;
+constexpr ErrorCode ErrorCode_MAX = INVALID_REQUEST;
 constexpr int ErrorCode_ARRAYSIZE = ErrorCode_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ErrorCode_descriptor();

@@ -44,25 +44,47 @@ namespace netcore
 		void setErrorCallback(const ProtobufErrorCallback & cb) { protobufErrorCallback_ = cb; }
 
 		virtual void onMessage(const ConnectionPtr &conn, Buffer &buf) override;
+		
 		void fillEmptyBuffer(Buffer *buf, const ProtoMsgPtr &msg);
+
+		void fillEmptyBuffer(Buffer *buf, const google::protobuf::Message *msg);
 
 		static const std::string& errorCodeToString(ErrorCode errorCode);
 
 	private:
-		int32_t asInt32(const char *buf);
-		int16_t asInt16(const char *buf);
+		int32_t asInt32(const char *buf) 
+		{ 
+			return (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3]; 
+		}
+		
+		int16_t asInt16(const char *buf) 
+		{ 
+			return (buf[0] << 8) + buf[1]; 
+		}
+
+		uint32_t asuInt32(const char *buf) 
+		{
+			return (static_cast<unsigned char>(buf[0]) << 24) + (static_cast<unsigned char>(buf[1]) << 16) + 
+				(static_cast<unsigned char>(buf[2]) << 8) + static_cast<unsigned char>(buf[3]);
+		}
+
+		uint16_t asuInt16(const char *buf) 
+		{
+			return (static_cast<unsigned char>(buf[0]) << 8) + static_cast<unsigned char>(buf[1]);
+		}
+
 		void defaultErrorCallback(const ConnectionPtr &, Buffer &, ErrorCode);
 		google::protobuf::Message* createMsgFromTypeName(const std::string &typeName);
-		ProtoMsgPtr parse(const char *buf, int len, ErrorCode * err);
+		ProtoMsgPtr parse(const char *buf, uint32_t len, ErrorCode * err);
 	private:
 		ProtobufMessageCallback protobufMessageCallback_;
 		ProtobufErrorCallback protobufErrorCallback_;
 
-		static const int HeaderLen = 4;
-		static const int CheckSumLen = 4;
-		static const int TypeNameLen = 2;
-		static const int MinMsgLen = TypeNameLen + 2 + CheckSumLen; // typenamelen, typename, checksum 
-		static const int MaxMsgLen = 64 * 1024 * 1024;
+		static const uint32_t HeaderLen = 4;
+		static const uint32_t CheckSumLen = 4;
+		static const uint32_t TypeNameLen = 2;
+		static const uint32_t MinMsgLen = TypeNameLen + 2 + CheckSumLen; // typenamelen, typename, checksum 
+		static const uint32_t MaxMsgLen = 64 * 1024 * 1024;
 	};
 }
 

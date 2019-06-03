@@ -19,7 +19,9 @@ class ClientTest
 public:
 	ClientTest(EventLoop *loop, const NetAddr &addr)
 		:client_(loop),
-		serveraddr_(addr)
+		serveraddr_(addr),
+		rpcChannel_(new ProtoRpcChannel()),
+		stub_(rpcChannel_.get())
 	{
 		client_.setConnectionCallback(std::bind(&ClientTest::onConnection, this, std::placeholders::_1));
 	}
@@ -36,23 +38,20 @@ public:
 	{
 		if (conn->isConnected())
 		{
-			ProtobufCodec *codec = new ProtobufCodec();
-			codec->setMessageCallback(std::bind(&ClientTest::onMessage, this, std::placeholders::_1, std::placeholders::_2));
-			conn->setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
-			conn->setMessageCallback(std::bind(&ProtobufCodec::onMessage, codec, std::placeholders::_1, std::placeholders::_2));
-					
-			Test *test = new Test();
-			test->set_id(1);
-			test->set_tester("qbh");
-			ProtoMsgPtr testptr(test);
-			Buffer buf;
-			codec->fillEmptyBuffer(&buf, testptr);
-			conn->send(buf);
+			rpcChannel_->connectionAttached(conn);
+			conn->attachProtoRpcChannel(rpcChannel_);
+			
+			TestRequest testReq;
+			testReq.set_testmsg("rpc test");
+			stub_.TestRpc(NULL, &testReq, NULL, NULL);
+			
 		}
 	}
 private:
 	Client client_;
 	NetAddr serveraddr_;
+	std::shared_ptr<ProtoRpcChannel> rpcChannel_;
+	TestService::Stub stub_;
 };
 
 int main()

@@ -40,12 +40,12 @@ public:
 			conn->setConnectionCodec<ProtobufCodec>(static_cast<Codec*>(codec));
 			conn->setMessageCallback(std::bind(&ProtobufCodec::onMessage, codec, std::placeholders::_1, std::placeholders::_2));
 					
-			Test *test = new Test();
-			test->set_id(1);
-			test->set_tester("qbh");
-			ProtoMsgPtr testptr(test);
+			Test test;
+			test.set_id(1);
+			test.set_tester("qbh");
+
 			Buffer buf;
-			codec->fillEmptyBuffer(&buf, testptr);
+			codec->fillEmptyBuffer(&buf, &test);
 			conn->send(buf);
 		}
 	}

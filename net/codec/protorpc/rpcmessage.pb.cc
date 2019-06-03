@@ -63,9 +63,9 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_rpcmessage_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\020rpcmessage.proto\022\007netcore\">\n\nRpcMessag"
   "e\022\017\n\007service\030\001 \002(\t\022\016\n\006method\030\002 \002(\t\022\017\n\007me"
-  "ssage\030\003 \001(\014*I\n\tErrorCode\022\014\n\010NO_ERROR\020\000\022\017"
-  "\n\013WRONG_PROTO\020\001\022\016\n\nNO_SERVICE\020\002\022\r\n\tNO_ME"
-  "THOD\020\003"
+  "ssage\030\003 \001(\014*\\\n\tErrorCode\022\n\n\006NO_ERR\020\000\022\017\n\013"
+  "WRONG_PROTO\020\001\022\016\n\nNO_SERVICE\020\002\022\r\n\tNO_METH"
+  "OD\020\003\022\023\n\017INVALID_REQUEST\020\004"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_rpcmessage_2eproto_deps[1] = {
 };
@@ -75,7 +75,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_rpc
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_rpcmessage_2eproto_once;
 static bool descriptor_table_rpcmessage_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_rpcmessage_2eproto = {
-  &descriptor_table_rpcmessage_2eproto_initialized, descriptor_table_protodef_rpcmessage_2eproto, "rpcmessage.proto", 166,
+  &descriptor_table_rpcmessage_2eproto_initialized, descriptor_table_protodef_rpcmessage_2eproto, "rpcmessage.proto", 185,
   &descriptor_table_rpcmessage_2eproto_once, descriptor_table_rpcmessage_2eproto_sccs, descriptor_table_rpcmessage_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_rpcmessage_2eproto::offsets,
   file_level_metadata_rpcmessage_2eproto, 1, file_level_enum_descriptors_rpcmessage_2eproto, file_level_service_descriptors_rpcmessage_2eproto,
@@ -94,6 +94,7 @@ bool ErrorCode_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
       return true;
     default:
       return false;
