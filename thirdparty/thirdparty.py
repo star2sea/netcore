@@ -58,11 +58,11 @@ with open("thirdparty.yaml") as f:
 
 assert conf is not None
 print("conf:%s"%conf)
-
+                         
 # check os type
 os_name = platform.system().lower()
 print("os_name", os_name)
-systems = {"win": "win", "darwin": "osx", "linux" : "linux"}
+systems = {"windows": "win", "darwin": "osx", "linux" : "linux"}
 for k, v in systems.items():
 	if os_name in k:
 		current_os = v
