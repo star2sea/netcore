@@ -1,6 +1,6 @@
 add_executable(protobuf_server protobuf_server.cpp test.pb.cc)
 add_executable(protobuf_client protobuf_client.cpp test.pb.cc)
-IF(UNIX)
+IF(UNIX AND NOT APPLE)
 target_link_libraries(protobuf_server netcore pthread)
 target_link_libraries(protobuf_client netcore pthread)
 ELSE()
