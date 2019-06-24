@@ -1,5 +1,6 @@
 #include "httpcodec.h"
 #include "../../connection.h"
+#include "http_parser/httpparser.h"
 
 using namespace netcore;
 
@@ -13,7 +14,11 @@ void HttpCodec::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 	bool ret = ctx_.parse(&buffer);
 	if (!ret)
 	{
-		conn->send("HTTP/1.1 404 Bad Request\r\n\r\n");
+		httpparser::HttpResponse response;
+		response.setStatus(HTTP_STATUS_NOT_FOUND);
+		response.setKeepAlive(false, true);
+		response.setBody(std::string(""), true);
+		conn->send(response.toStr());
 		conn->shutdown();
 	}
 	else if (ctx_.parseDone())
@@ -22,7 +27,9 @@ void HttpCodec::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 		httpCallback_(conn, ctx_.message(), &response);
 		conn->send(response.toStr());
 		if (!response.getKeepAlive())
+		{
 			conn->shutdown();
+		}
 		ctx_.reset();
 	}
 }
@@ -30,5 +37,5 @@ void HttpCodec::onMessage(const ConnectionPtr &conn, Buffer &buffer)
 void HttpCodec::defalutHttpCallback(const ConnectionPtr &conn, const httpparser::HttpMessage *msg, httpparser::HttpResponse *rsp)
 {
 	rsp->setStatus(HTTP_STATUS_OK);
-	rsp->setKeepAlive(true, true);
+	rsp->setKeepAlive(false, true);
 }

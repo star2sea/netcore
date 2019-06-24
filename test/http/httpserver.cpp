@@ -23,10 +23,11 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 {
 	if (conn->isConnected())
 	{
+		LOG_INFO << "new connction, peeraddr " << conn->getPeerAddr().toIpPort() <<
+			" localaddr " << conn->getLocalAddr().toIpPort();
 		HttpCodec *codec = new HttpCodec(HTTP_REQUEST);
 		codec->setMessageCallback(std::bind(&HttpServer::onMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 		conn->setConnectionCodec<HttpCodec>(static_cast<Codec*>(codec));
-		/*conn->setMessageCallback(std::bind(&HttpCodec::onMessage, codec, std::placeholders::_1, std::placeholders::_2));*/
 	}
 }
 
@@ -35,4 +36,5 @@ void HttpServer::onMessage(const netcore::ConnectionPtr &conn, const httpparser:
 	//LOG_INFO << "HttpCodec Send Message: " << msg->toStr();
 	rsp->setStatus(HTTP_STATUS_OK);
 	rsp->setKeepAlive(true, true);
+	rsp->setBody(std::string(""), true);
 }
