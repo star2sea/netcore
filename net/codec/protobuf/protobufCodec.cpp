@@ -121,7 +121,7 @@ void ProtobufCodec::fillEmptyBuffer(Buffer *buf, const google::protobuf::Message
 	const std::string &typeName = msg->GetTypeName();
 	uint32_t namelen = static_cast<uint32_t>(typeName.size() + 1);
 
-	const char namelen_buf[2] = { (namelen >> 8) & 0xff, namelen & 0xff };
+	const char namelen_buf[2] = { static_cast<char>((namelen >> 8) & 0xff), static_cast<char>(namelen & 0xff) };
 	buf->append(namelen_buf, 2);
 	buf->append(typeName.c_str(), namelen);
 
@@ -134,11 +134,11 @@ void ProtobufCodec::fillEmptyBuffer(Buffer *buf, const google::protobuf::Message
 	buf->hasWritten(bytesize);
 
 	uint32_t checksum = static_cast<uint32_t>(::adler32(1, reinterpret_cast<const Bytef*>(buf->readBegin()), static_cast<uint32_t>(buf->readAvailable())));
-	const char checksum_buf[4] = { (checksum >> 24) & 0xff, (checksum >> 16) & 0xff, (checksum >> 8) & 0xff, checksum & 0xff };
+	const char checksum_buf[4] = { static_cast<char>((checksum >> 24) & 0xff), static_cast<char>((checksum >> 16) & 0xff), static_cast<char>((checksum >> 8) & 0xff), static_cast<char>(checksum & 0xff) };
 	buf->append(checksum_buf, 4);
 
 	uint32_t len = static_cast<uint32_t>(buf->readAvailable());
-	const char len_buf[4] = { (len >> 24) & 0xff, (len >> 16) & 0xff, (len >> 8) & 0xff, len & 0xff };
+	const char len_buf[4] = { static_cast<char>((len >> 24) & 0xff), static_cast<char>((len >> 16)) & 0xff, static_cast<char>((len >> 8) & 0xff), static_cast<char>(len & 0xff) };
 	buf->prepend(len_buf, 4);
 }
 
