@@ -32,7 +32,7 @@ void HttpServer::onConnection(const ConnectionPtr &conn)
 
 void HttpServer::onMessage(const netcore::ConnectionPtr &conn, const httpparser::HttpMessage *msg, httpparser::HttpResponse *rsp)
 {
-	LOG_INFO << "HttpCodec Send Message: " << msg->toStr();
+	//LOG_INFO << "HttpCodec Send Message: " << msg->toStr();
 	rsp->setStatus(HTTP_STATUS_OK);
 	rsp->setKeepAlive(true, true);
 }
