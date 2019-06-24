@@ -20,7 +20,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(thirdparty/install/include)
-link_directories(${PROJECT_BINARY_DIR}/libs)
+link_directories(${PROJECT_BINARY_DIR}/lib)
 link_directories(thirdparty/install/lib)
 
 macro(add_vg_source_dir name)

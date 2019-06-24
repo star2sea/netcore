@@ -59,7 +59,7 @@ int main()
 #endif
 	
 	EventLoop loop;
-	NetAddr serveraddr("127.0.0.1", 33333);
+	NetAddr serveraddr("127.0.0.1", (short)33333);
 	ServerTest st(&loop, serveraddr);
 	st.start();
 	loop.loop();
