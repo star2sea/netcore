@@ -84,7 +84,7 @@ namespace netcore {
 
 void Test::InitAsDefaultInstance() {
 }
-class Test::HasBitSetters {
+class Test::_Internal {
  public:
   using HasBits = decltype(std::declval<Test>()._has_bits_);
   static void set_has_id(HasBits* has_bits) {
@@ -94,11 +94,6 @@ class Test::HasBitSetters {
     (*has_bits)[0] |= 1u;
   }
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Test::kIdFieldNumber;
-const int Test::kTesterFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Test::Test()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -160,7 +155,7 @@ void Test::Clear() {
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 const char* Test::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  HasBitSetters::HasBits has_bits{};
+  _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -169,7 +164,7 @@ const char* Test::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inter
       // required int64 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          HasBitSetters::set_has_id(&has_bits);
+          _Internal::set_has_id(&has_bits);
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
@@ -215,7 +210,7 @@ bool Test::MergePartialFromCodedStream(
       // required int64 id = 1;
       case 1: {
         if (static_cast< ::PROTOBUF_NAMESPACE_ID::uint8>(tag) == (8 & 0xFF)) {
-          HasBitSetters::set_has_id(&_has_bits_);
+          _Internal::set_has_id(&_has_bits_);
           DO_((::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::ReadPrimitive<
                    ::PROTOBUF_NAMESPACE_ID::int64, ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64>(
                  input, &id_)));
@@ -427,10 +422,6 @@ bool Test::IsInitialized() const {
   return true;
 }
 
-void Test::Swap(Test* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void Test::InternalSwap(Test* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

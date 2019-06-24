@@ -106,7 +106,7 @@ bool ErrorCode_IsValid(int value) {
 
 void RpcMessage::InitAsDefaultInstance() {
 }
-class RpcMessage::HasBitSetters {
+class RpcMessage::_Internal {
  public:
   using HasBits = decltype(std::declval<RpcMessage>()._has_bits_);
   static void set_has_service(HasBits* has_bits) {
@@ -119,12 +119,6 @@ class RpcMessage::HasBitSetters {
     (*has_bits)[0] |= 4u;
   }
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int RpcMessage::kServiceFieldNumber;
-const int RpcMessage::kMethodFieldNumber;
-const int RpcMessage::kMessageFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 RpcMessage::RpcMessage()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -203,7 +197,7 @@ void RpcMessage::Clear() {
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 const char* RpcMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  HasBitSetters::HasBits has_bits{};
+  _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -525,10 +519,6 @@ bool RpcMessage::IsInitialized() const {
   return true;
 }
 
-void RpcMessage::Swap(RpcMessage* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void RpcMessage::InternalSwap(RpcMessage* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);

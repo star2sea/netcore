@@ -17,6 +17,6 @@ thirdparty:
         git: https://github.com/madler/zlib.git
 
     protobuf:
-        git: https://github.com/protocolbuffers/protobuf.git
+        git: https://github.com/star2sea/protobuf.git
         cmakelist_dir: cmake
         cmake_args: [-Dprotobuf_MSVC_STATIC_RUNTIME=OFF]

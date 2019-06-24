@@ -110,17 +110,13 @@ namespace netcore {
 
 void TestRequest::InitAsDefaultInstance() {
 }
-class TestRequest::HasBitSetters {
+class TestRequest::_Internal {
  public:
   using HasBits = decltype(std::declval<TestRequest>()._has_bits_);
   static void set_has_testmsg(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int TestRequest::kTestmsgFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TestRequest::TestRequest()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -179,7 +175,7 @@ void TestRequest::Clear() {
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 const char* TestRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  HasBitSetters::HasBits has_bits{};
+  _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -380,10 +376,6 @@ bool TestRequest::IsInitialized() const {
   return true;
 }
 
-void TestRequest::Swap(TestRequest* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void TestRequest::InternalSwap(TestRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -401,13 +393,10 @@ void TestRequest::InternalSwap(TestRequest* other) {
 
 void TestResponse::InitAsDefaultInstance() {
 }
-class TestResponse::HasBitSetters {
+class TestResponse::_Internal {
  public:
   using HasBits = decltype(std::declval<TestResponse>()._has_bits_);
 };
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TestResponse::TestResponse()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
@@ -592,10 +581,6 @@ bool TestResponse::IsInitialized() const {
   return true;
 }
 
-void TestResponse::Swap(TestResponse* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void TestResponse::InternalSwap(TestResponse* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
