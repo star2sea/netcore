@@ -54,6 +54,11 @@ elseif (UNIX)
 endif()
 
 add_library(netcore STATIC ${ALL_SRC})
-target_link_libraries(netcore zlibstatic libprotobuf http_parser)
+
+if (WIN32)
+	target_link_libraries(netcore zlibstatic libprotobuf http_parser)
+else()
+	target_link_libraries(netcore z protobuf http_parser)
+endif()
 
 add_subdirectory(test)
